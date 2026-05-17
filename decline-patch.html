@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decline Patch — Endpoint Central</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* === RESET === */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:14px}
+    body{font-family:'Lato','Segoe UI',Roboto,Arial,sans-serif;background:#f5f6fa;color:#333;overflow:hidden;height:100vh}
+    a{text-decoration:none;color:inherit}
+    ul{list-style:none}
+    hr{border:none;border-top:1px solid #e4e4e4;margin:4px 0}
+    button{font-family:inherit;cursor:pointer}
+
+    /* === TOPBAR === */
+    .topbar{display:flex;align-items:center;height:48px;background:#222;color:#fff;padding:0 0 0 12px;position:fixed;top:0;left:0;right:0;z-index:1000}
+    .topbar-left{display:flex;align-items:center;gap:8px;padding-right:12px}
+    .brand{display:flex;align-items:center;gap:8px}
+    .brand-icon{font-size:22px;background:linear-gradient(135deg,#e53935,#f9a825,#43a047,#1e88e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .brand-text{font-size:14px;font-weight:600;white-space:nowrap;color:#fff}
+    .topbar-nav{display:flex;align-items:center;height:100%;flex:1;overflow:hidden}
+    .topnav-item{padding:0 13px;height:48px;display:flex;align-items:center;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.7);border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;cursor:pointer}
+    .topnav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .topnav-item.active{color:#fff;border-bottom-color:#4d90fe;background:rgba(77,144,254,.15)}
+    .topnav-overflow{position:relative;height:48px;display:flex;align-items:center}
+    .overflow-dots{padding:0 12px;height:48px;display:flex;align-items:center;font-size:16px;letter-spacing:2px;color:rgba(255,255,255,.7);cursor:pointer;font-weight:bold}
+    .overflow-dots:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .overflow-menu{display:none;position:absolute;top:48px;left:0;background:#fff;color:#333;border-radius:0 0 8px 8px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:180px;z-index:1100;overflow:hidden}
+    .overflow-menu.open{display:block}
+    .overflow-menu a{display:block;padding:10px 18px;font-size:13px;color:#333;transition:background .1s}
+    .overflow-menu a:hover{background:#f0f4ff;color:#1a73e8}
+    .topbar-right{display:flex;align-items:center;gap:2px;margin-left:auto;padding-right:8px;flex-shrink:0}
+    .trial-btn{background:#4d90fe;color:#fff;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap;margin-right:4px}
+    .trial-btn:hover{background:#3b7ddb}
+    .jump-sdp{display:flex;align-items:center;gap:4px;padding:6px 10px;font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap;border:1px solid rgba(255,255,255,.2);border-radius:4px;margin-right:4px}
+    .jump-sdp:hover{color:#fff}
+    .jump-sdp i{color:#4d90fe}
+    .topbar-action{padding:8px 10px;cursor:pointer;border-radius:4px;font-size:15px;position:relative;color:rgba(255,255,255,.7);transition:background .15s}
+    .topbar-action:hover{background:rgba(255,255,255,.1);color:#fff}
+    .user-avatar{font-size:20px}
+    .user-dropdown{display:none;position:absolute;top:44px;right:0;background:#fff;color:#333;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:180px;z-index:1100;overflow:hidden}
+    .user-dropdown.open{display:block}
+    .user-dropdown a{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;transition:background .1s;color:#333}
+    .user-dropdown a:hover{background:#f5f7fa}
+
+    /* === LAYOUT === */
+    .main-wrapper{display:flex;margin-top:48px;height:calc(100vh - 48px)}
+
+    /* === ICON SIDEBAR === */
+    .icon-sidebar{width:68px;min-width:68px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;align-items:center;padding:8px 0;overflow-y:auto;overflow-x:hidden}
+    .icon-sb-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:54px;padding:9px 4px;border-radius:8px;cursor:pointer;color:#666;transition:all .15s;margin-bottom:2px}
+    .icon-sb-item i{font-size:17px}
+    .icon-sb-item span{font-size:9.5px;text-align:center;line-height:1.2;font-weight:500}
+    .icon-sb-item:hover{background:#f0f4ff;color:#1a73e8}
+    .icon-sb-item.active{background:#e8f0fe;color:#1a73e8}
+
+    /* === TEXT NAV SIDEBAR === */
+    .text-sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;overflow-y:auto;position:relative}
+    .text-sidebar-nav{flex:1;padding:8px 0}
+    .tsb-group-header{display:flex;align-items:center;gap:5px;padding:10px 16px 6px;font-size:12.5px;font-weight:700;color:#333;cursor:pointer;user-select:none}
+    .tsb-arrow{font-size:10px;color:#555}
+    .tsb-items li a{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 8px 26px;font-size:13px;color:#555;cursor:pointer;transition:all .1s;border-left:3px solid transparent}
+    .tsb-items li a:hover{background:#f0f4ff;color:#1a73e8}
+    .tsb-items li a.active{background:#e8f0fe;color:#1a73e8;border-left-color:#1a73e8;font-weight:500}
+    .tsb-items.hidden{display:none}
+    .nav-badge{display:inline-flex;align-items:center;justify-content:center;background:#757575;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;min-width:20px}
+    .tsb-collapse{display:flex;align-items:center;justify-content:flex-end;padding:8px 10px;border-top:1px solid #f0f0f0}
+    .tsb-collapse button{background:none;border:none;color:#aaa;font-size:14px;cursor:pointer;padding:4px 8px;border-radius:4px}
+    .tsb-collapse button:hover{background:#f0f0f0;color:#555}
+
+    /* === CONTENT === */
+    .content{flex:1;overflow-y:auto;background:#f5f6fa;display:flex;flex-direction:column}
+
+    /* === CONTENT TOOLBAR === */
+    .content-toolbar{display:flex;align-items:center;padding:12px 24px;background:#fff;border-bottom:1px solid #e8e8e8;gap:10px}
+    .btn-select-group{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;font-size:13px;font-weight:500;border:1px solid #1a73e8;border-radius:4px;color:#1a73e8;background:#fff;cursor:pointer;transition:all .15s}
+    .btn-select-group:hover{background:#e8f0fe}
+    .toolbar-right{margin-left:auto;display:flex;align-items:center;gap:4px}
+    .total-label{font-size:13px;color:#1a73e8;font-weight:500;margin-right:4px}
+    .icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:#555;font-size:13px}
+    .icon-btn:hover{background:#f0f0f0}
+    .watch-demo{display:flex;align-items:center;gap:5px;font-size:13px;color:#1a73e8;font-weight:500;margin-left:auto}
+    .watch-demo:hover{text-decoration:underline}
+
+    /* === TABLE === */
+    .table-wrap{background:#fff;overflow-x:auto;flex:1}
+    table.data-table{width:100%;border-collapse:collapse;min-width:600px}
+    table.data-table th{background:#f8f9fa;font-size:12.5px;font-weight:600;color:#5f6368;padding:11px 20px;text-align:left;border-bottom:1px solid #e8e8e8;white-space:nowrap;position:sticky;top:0}
+    table.data-table th.sortable{cursor:pointer}
+    table.data-table th.sortable:hover{background:#eef0f3}
+    table.data-table th .sort-icon{margin-left:5px;font-size:11px;color:#888}
+    table.data-table td{padding:13px 20px;font-size:13px;border-bottom:1px solid #f0f0f0;color:#333;vertical-align:middle}
+    table.data-table tbody tr:hover{background:#f8fafd}
+    table.data-table td a.group-link{color:#1a73e8}
+    table.data-table td a.group-link:hover{text-decoration:underline}
+    table.data-table th:first-child,table.data-table td:first-child{padding-left:24px}
+    .action-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:6px;border:1px solid #e0e0e0;background:#fff;color:#555;cursor:pointer;font-size:14px;transition:all .15s}
+    .action-btn:hover{background:#f0f0f0;border-color:#bbb;color:#333}
+
+    /* === PAGINATION === */
+    .table-pagination{display:flex;align-items:center;justify-content:flex-end;padding:10px 20px;font-size:12.5px;color:#555;border-top:1px solid #f0f0f0;background:#fff;gap:6px;flex-shrink:0}
+    .table-pagination .total-text{margin-right:8px}
+    .table-pagination .total-text a{color:#1a73e8}
+    .page-nav-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid #dadce0;border-radius:4px;cursor:pointer;color:#555;font-size:13px;background:#fff}
+    .page-nav-btn:hover{background:#f0f0f0}
+    .per-page-select{padding:3px 6px;border:1px solid #dadce0;border-radius:4px;font-size:12.5px;color:#333;background:#fff;cursor:pointer;outline:none}
+
+    /* === MODAL === */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:2000;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:10px;width:520px;box-shadow:0 8px 40px rgba(0,0,0,.22);overflow:hidden;display:flex;flex-direction:column;max-height:80vh}
+    .modal-header{padding:18px 22px 14px;border-bottom:1px solid #e8e8e8;flex-shrink:0}
+    .modal-header h2{font-size:15px;font-weight:700;color:#222}
+    .modal-header p{font-size:12.5px;color:#777;margin-top:3px}
+    .modal-body{padding:20px 22px;overflow-y:auto;flex:1}
+    .modal-field{margin-bottom:16px}
+    .modal-field label{font-size:13px;font-weight:500;color:#555;display:block;margin-bottom:5px}
+    .modal-field select,.modal-field input[type=text]{width:100%;padding:8px 12px;border:1px solid #dadce0;border-radius:5px;font-size:13px;outline:none;color:#333;background:#fff}
+    .modal-field select:focus,.modal-field input:focus{border-color:#1a73e8}
+    .modal-search-wrap{position:relative}
+    .modal-search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#aaa;font-size:12px}
+    .modal-search-wrap input{padding-left:30px}
+    .patch-list{border:1px solid #e0e0e0;border-radius:6px;max-height:180px;overflow-y:auto;margin-top:4px}
+    .patch-list-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #f5f5f5;font-size:13px;cursor:pointer;transition:background .1s}
+    .patch-list-item:last-child{border-bottom:none}
+    .patch-list-item:hover{background:#f8fafd}
+    .patch-list-item input[type=checkbox]{accent-color:#1a73e8;width:14px;height:14px;cursor:pointer;flex-shrink:0}
+    .patch-list-item .sev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .sev-dot.critical{background:#d32f2f}
+    .sev-dot.warning{background:#f9a825}
+    .sev-dot.low{background:#9e9e9e}
+    .modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 22px;border-top:1px solid #f0f0f0;flex-shrink:0}
+    .btn-decline{padding:8px 22px;background:#d32f2f;color:#fff;border:none;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-decline:hover{background:#b71c1c}
+    .btn-cancel-modal{padding:8px 18px;background:#fff;color:#333;border:1px solid #dadce0;border-radius:5px;font-size:13px;cursor:pointer;transition:background .15s}
+    .btn-cancel-modal:hover{background:#f5f5f5}
+
+    /* === SCROLLBAR === */
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#c0c7d0;border-radius:3px}
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <span class="brand-icon"><i class="fa-solid fa-circle-notch"></i></span>
+        <span class="brand-text">Endpoint Central</span>
+      </div>
+    </div>
+    <nav class="topbar-nav">
+      <a href="#" class="topnav-item">Home</a>
+      <a href="#" class="topnav-item">Configurations</a>
+      <a href="#" class="topnav-item active">Threats &amp; Patches</a>
+      <a href="#" class="topnav-item">Software Deployment</a>
+      <a href="#" class="topnav-item">Inventory</a>
+      <a href="#" class="topnav-item">Agent</a>
+      <div class="topnav-overflow" id="overflowBtn">
+        <span class="overflow-dots">•••</span>
+        <div class="overflow-menu" id="overflowMenu">
+          <a href="#">OS Deployment</a>
+          <a href="#">MDM</a>
+          <a href="#">Tools</a>
+          <a href="#">Admin</a>
+          <a href="#">Browsers</a>
+        </div>
+      </div>
+    </nav>
+    <div class="topbar-right">
+      <a href="#" class="trial-btn">Start your 30 days free trial</a>
+      <a href="#" class="jump-sdp"><i class="fa fa-circle" style="font-size:10px"></i> Jump to SDP</a>
+      <div class="topbar-action" title="Search"><i class="fa fa-search"></i></div>
+      <div class="topbar-action" title="Notifications"><i class="fa fa-bell"></i></div>
+      <div class="topbar-action" title="What's New"><i class="fa fa-bolt"></i></div>
+      <div class="topbar-action user-avatar" id="userMenu" style="position:relative">
+        <i class="fa fa-user-circle"></i>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="#"><i class="fa fa-user"></i> My Profile</a>
+          <a href="#"><i class="fa fa-key"></i> Change Password</a>
+          <hr />
+          <a href="#"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+      <div class="topbar-action" title="Apps"><i class="fa fa-th"></i></div>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-wrapper">
+
+    <!-- ICON SIDEBAR -->
+    <aside class="icon-sidebar">
+      <div class="icon-sb-item"><i class="fa fa-gauge"></i><span>Dashboard</span></div>
+      <div class="icon-sb-item"><i class="fa fa-shield-halved"></i><span>Threats</span></div>
+      <div class="icon-sb-item active"><i class="fa fa-file-shield"></i><span>Patches</span></div>
+      <div class="icon-sb-item"><i class="fa fa-desktop"></i><span>Systems</span></div>
+      <div class="icon-sb-item" onclick="window.location.href='patch-approval-settings.html'" title="Deployment"><i class="fa fa-rocket"></i><span>Deployment</span></div>
+      <div class="icon-sb-item"><i class="fa fa-clipboard-check"></i><span>Compliance</span></div>
+      <div class="icon-sb-item"><i class="fa fa-chart-bar"></i><span>Reports</span></div>
+      <div class="icon-sb-item"><i class="fa fa-gear"></i><span>Settings</span></div>
+      <div class="icon-sb-item"><i class="fa fa-arrows-rotate"></i><span>Update Now</span></div>
+    </aside>
+
+    <!-- TEXT NAV SIDEBAR -->
+    <aside class="text-sidebar">
+      <nav class="text-sidebar-nav">
+
+        <!-- Patches group -->
+        <div class="tsb-group-header" onclick="toggleGroup('patchItems','patchArrow')">
+          <span class="tsb-arrow" id="patchArrow">▾</span> Patches
+        </div>
+        <ul class="tsb-items" id="patchItems">
+          <li><a href="missing-patches.html"><span>Missing Patches</span><span class="nav-badge">316</span></a></li>
+          <li><a href="#"><span>Installed Patches</span><span class="nav-badge">81</span></a></li>
+          <li><a href="#"><span>Applicable Patches</span><span class="nav-badge">397</span></a></li>
+          <li><a href="#"><span>Top-Priority Patches</span></a></li>
+          <li><a href="#"><span>Supported Patches</span><span class="nav-badge">554388</span></a></li>
+          <li><a href="#"><span>Latest Patches</span><span class="nav-badge">78203</span></a></li>
+          <li><a href="#"><span>Detailed View</span></a></li>
+          <li><a href="#"><span>Downloaded Patches</span></a></li>
+          <li><a href="decline-patch.html" class="active"><span>Decline Patch</span></a></li>
+        </ul>
+
+        <!-- Attention Required group -->
+        <div class="tsb-group-header" onclick="toggleGroup('attnItems','attnArrow')">
+          <span class="tsb-arrow" id="attnArrow">▾</span> Attention Required
+        </div>
+        <ul class="tsb-items" id="attnItems">
+          <li><a href="#"><span>Upload Pending</span><span class="nav-badge" style="background:#e53935">1</span></a></li>
+        </ul>
+
+        <!-- Deployment group -->
+        <div class="tsb-group-header" onclick="toggleGroup('deployDpItems','deployDpArrow')">
+          <span class="tsb-arrow" id="deployDpArrow">▸</span> Deployment
+        </div>
+        <ul class="tsb-items hidden" id="deployDpItems">
+          <li><a href="patch-approval-settings.html"><span>Patch Approval Settings</span></a></li>
+        </ul>
+
+      </nav>
+      <div class="tsb-collapse">
+        <button title="Collapse sidebar"><i class="fa fa-angle-double-left"></i></button>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Toolbar -->
+      <div class="content-toolbar">
+        <button class="btn-select-group" onclick="window.location.href='decline-patch-select.html'">
+          <i class="fa fa-plus"></i> Select Group &amp; Decline Patch
+        </button>
+        <div class="toolbar-right">
+          <span class="total-label">Total Records |</span>
+          <div class="icon-btn" title="Search"><i class="fa fa-search"></i></div>
+          <div class="icon-btn" title="Export"><i class="fa fa-table-columns"></i></div>
+        </div>
+        <a href="#" class="watch-demo" style="margin-left:16px">
+          <i class="fa fa-circle-play"></i> Watch Demo
+        </a>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="sortable" id="sortGroupTh">
+                Group Name <i class="fa fa-arrow-up sort-icon" id="sortGroupIcon"></i>
+              </th>
+              <th>Modified Time</th>
+              <th>Last Modified By</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="declineTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="table-pagination">
+        <span class="total-text">1 – 2 of <a href="#">Total Records</a></span>
+        <div class="page-nav-btn" title="Previous">&#8249;</div>
+        <select class="per-page-select" title="Rows per page">
+          <option>50</option><option>25</option><option>100</option>
+        </select>
+        <div class="page-nav-btn" title="Next">&#8250;</div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- SELECT GROUP & DECLINE PATCH MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Select Group &amp; Decline Patch</h2>
+        <p>Choose a computer group and select the patches to decline.</p>
+      </div>
+      <div class="modal-body">
+
+        <!-- Group select -->
+        <div class="modal-field">
+          <label>Computer Group <span style="color:#d32f2f">*</span></label>
+          <select id="modalGroupSelect">
+            <option value="">— Select group —</option>
+            <option value="All Computers Group">All Computers Group</option>
+            <option value="Remote Office">Remote Office</option>
+            <option value="Branch - East">Branch - East</option>
+            <option value="Branch - West">Branch - West</option>
+          </select>
+        </div>
+
+        <!-- Patch search -->
+        <div class="modal-field">
+          <label>Patches to Decline</label>
+          <div class="modal-search-wrap" style="margin-bottom:6px">
+            <i class="fa fa-search"></i>
+            <input type="text" id="patchSearch" placeholder="Search patches…" oninput="filterPatches()" />
+          </div>
+          <div class="patch-list" id="patchList">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div class="modal-field">
+          <label>Reason for declining <span style="color:#999;font-weight:400">(optional)</span></label>
+          <input type="text" placeholder="e.g. Not compatible with our environment" />
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
+        <button class="btn-decline" onclick="submitDecline()">Decline Patch</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ===== TABLE DATA ===== */
+    const DECLINE_DATA = [
+      { group:'All Computers Group', modified:'Nov 21, 2025  12:21 PM', modifiedBy:'demo' },
+      { group:'Remote Office',       modified:'Jan 28, 2022  02:45 AM', modifiedBy:'admin_en_us' },
+    ];
+
+    const PATCHES = [
+      { id:'17268',  bulletin:'MS15-028',  desc:'Security Update for Windows 8 (KB3030377)',                   sev:'warning' },
+      { id:'8584',   bulletin:'MS10-033',  desc:'Security Update for Windows 7 (KB979482)',                    sev:'critical' },
+      { id:'11943',  bulletin:'MS12-035',  desc:'Security Update for .NET Framework 3.5.1 (KB2604115)',        sev:'critical' },
+      { id:'98726',  bulletin:'MSWU-577',  desc:'Update for .NET Framework 4.5 for Windows 8 (KB2977765)',     sev:'low' },
+      { id:'98593',  bulletin:'MSWU-536',  desc:'Update for Windows 8 (KB2800088)',                            sev:'low' },
+      { id:'15979',  bulletin:'MS14-045',  desc:'Security Update for Windows 8 (KB2993651)',                   sev:'warning' },
+      { id:'100501', bulletin:'MSWU-1106', desc:'Update for Windows 8 (KB3000853)',                            sev:'low' },
+      { id:'14051',  bulletin:'MS13-052',  desc:'Security Update for .NET Framework 4.5 (KB2840628)',          sev:'warning' },
+    ];
+
+    /* ===== RENDER TABLE ===== */
+    let sortAsc = true;
+    function renderTable(data) {
+      document.getElementById('declineTableBody').innerHTML = data.map(row => `
+        <tr>
+          <td><a href="#" class="group-link">${row.group}</a></td>
+          <td style="color:#555">${row.modified}</td>
+          <td style="color:#555">${row.modifiedBy}</td>
+          <td>
+            <button class="action-btn" title="Manage declined patches for this group">
+              <i class="fa fa-link"></i>
+            </button>
+          </td>
+        </tr>`).join('');
+    }
+
+    document.getElementById('sortGroupTh').addEventListener('click', function () {
+      sortAsc = !sortAsc;
+      const icon = document.getElementById('sortGroupIcon');
+      icon.className = sortAsc ? 'fa fa-arrow-up sort-icon' : 'fa fa-arrow-down sort-icon';
+      const sorted = [...DECLINE_DATA].sort((a, b) =>
+        sortAsc ? a.group.localeCompare(b.group) : b.group.localeCompare(a.group));
+      renderTable(sorted);
+    });
+
+    /* ===== MODAL ===== */
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('open');
+      renderPatchList('');
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('patchSearch').value = '';
+    }
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    function renderPatchList(query) {
+      const q = query.toLowerCase();
+      const filtered = PATCHES.filter(p =>
+        p.desc.toLowerCase().includes(q) || p.bulletin.toLowerCase().includes(q));
+      document.getElementById('patchList').innerHTML = filtered.length ? filtered.map(p => `
+        <div class="patch-list-item">
+          <input type="checkbox" />
+          <span class="sev-dot ${p.sev}"></span>
+          <span style="color:#1a73e8;font-size:12px;min-width:52px">${p.id}</span>
+          <span style="flex:1;color:#333">${p.desc}</span>
+        </div>`).join('') :
+        '<div style="padding:14px 16px;font-size:13px;color:#999;text-align:center">No patches found</div>';
+    }
+
+    function filterPatches() {
+      renderPatchList(document.getElementById('patchSearch').value);
+    }
+
+    function submitDecline() {
+      const group = document.getElementById('modalGroupSelect').value;
+      if (!group) {
+        document.getElementById('modalGroupSelect').style.borderColor = '#d32f2f';
+        return;
+      }
+      closeModal();
+      const now = new Date();
+      const ts  = now.toLocaleString('en-US', { month:'short', day:'2-digit', year:'numeric',
+                                                hour:'2-digit', minute:'2-digit', hour12:true });
+      if (!DECLINE_DATA.find(r => r.group === group)) {
+        DECLINE_DATA.push({ group, modified: ts, modifiedBy: 'demo' });
+      }
+      renderTable(DECLINE_DATA);
+    }
+
+    /* ===== SIDEBAR GROUPS ===== */
+    function toggleGroup(itemsId, arrowId) {
+      const items = document.getElementById(itemsId);
+      const arrow = document.getElementById(arrowId);
+      const isOpen = !items.classList.contains('hidden');
+      items.classList.toggle('hidden', isOpen);
+      arrow.textContent = isOpen ? '▸' : '▾';
+    }
+
+    /* ===== TOPBAR DROPDOWNS ===== */
+    document.getElementById('overflowBtn').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('overflowMenu').classList.toggle('open');
+      document.getElementById('userDropdown').classList.remove('open');
+    });
+    document.getElementById('userMenu').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('userDropdown').classList.toggle('open');
+      document.getElementById('overflowMenu').classList.remove('open');
+    });
+    document.addEventListener('click', () => {
+      document.getElementById('overflowMenu').classList.remove('open');
+      document.getElementById('userDropdown').classList.remove('open');
+    });
+
+    /* ===== INIT ===== */
+    renderTable(DECLINE_DATA);
+  </script>
+</body>
+</html>

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patch Approval Settings — Endpoint Central</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* === RESET === */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:14px}
+    body{font-family:'Lato','Segoe UI',Roboto,Arial,sans-serif;background:#f5f6fa;color:#333;overflow:hidden;height:100vh}
+    a{text-decoration:none;color:inherit}
+    ul{list-style:none}
+    hr{border:none;border-top:1px solid #e4e4e4;margin:4px 0}
+    button{font-family:inherit;cursor:pointer}
+
+    /* === TOPBAR === */
+    .topbar{display:flex;align-items:center;height:48px;background:#222;color:#fff;padding:0 0 0 12px;position:fixed;top:0;left:0;right:0;z-index:1000}
+    .topbar-left{display:flex;align-items:center;gap:8px;padding-right:12px}
+    .brand{display:flex;align-items:center;gap:8px}
+    .brand-icon{font-size:22px;background:linear-gradient(135deg,#e53935,#f9a825,#43a047,#1e88e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .brand-text{font-size:14px;font-weight:600;white-space:nowrap;color:#fff}
+    .topbar-nav{display:flex;align-items:center;height:100%;flex:1;overflow:hidden}
+    .topnav-item{padding:0 12px;height:48px;display:flex;align-items:center;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.7);border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;cursor:pointer}
+    .topnav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .topnav-item.active{color:#fff;border-bottom-color:#4d90fe;background:rgba(77,144,254,.15)}
+    .topnav-overflow{position:relative;height:48px;display:flex;align-items:center}
+    .overflow-dots{padding:0 12px;height:48px;display:flex;align-items:center;font-size:16px;letter-spacing:2px;color:rgba(255,255,255,.7);cursor:pointer;font-weight:bold}
+    .overflow-dots:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .overflow-menu{display:none;position:absolute;top:48px;left:0;background:#fff;color:#333;border-radius:0 0 8px 8px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:180px;z-index:1100;overflow:hidden}
+    .overflow-menu.open{display:block}
+    .overflow-menu a{display:block;padding:10px 18px;font-size:13px;color:#333;transition:background .1s}
+    .overflow-menu a:hover{background:#f0f4ff;color:#1a73e8}
+    .topbar-right{display:flex;align-items:center;gap:2px;margin-left:auto;padding-right:8px;flex-shrink:0}
+    .jump-sdp{display:flex;align-items:center;gap:4px;padding:6px 10px;font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap;border:1px solid rgba(255,255,255,.2);border-radius:4px;margin-right:4px}
+    .jump-sdp:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+    .jump-sdp i{color:#4d90fe}
+    .topbar-action{padding:8px 10px;cursor:pointer;border-radius:4px;font-size:15px;position:relative;color:rgba(255,255,255,.7);transition:background .15s}
+    .topbar-action:hover{background:rgba(255,255,255,.1);color:#fff}
+    .user-avatar{font-size:20px}
+    .user-dropdown{display:none;position:absolute;top:44px;right:0;background:#fff;color:#333;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:180px;z-index:1100;overflow:hidden}
+    .user-dropdown.open{display:block}
+    .user-dropdown a{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;transition:background .1s;color:#333}
+    .user-dropdown a:hover{background:#f5f7fa}
+
+    /* === LAYOUT === */
+    .main-wrapper{display:flex;margin-top:48px;height:calc(100vh - 48px)}
+
+    /* === ICON SIDEBAR === */
+    .icon-sidebar{width:64px;min-width:64px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;align-items:center;padding:6px 0;overflow-y:auto;overflow-x:hidden;z-index:10}
+    .icon-sidebar-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:52px;padding:8px 4px;border-radius:8px;cursor:pointer;color:#666;transition:all .15s;margin-bottom:2px}
+    .icon-sidebar-item i{font-size:17px}
+    .icon-sidebar-item span{font-size:9.5px;text-align:center;line-height:1.2;font-weight:500}
+    .icon-sidebar-item:hover{background:#f0f4ff;color:#1a73e8}
+    .icon-sidebar-item.active{background:#e8f0fe;color:#1a73e8}
+
+    /* === TEXT NAV SIDEBAR === */
+    .text-sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;overflow-y:auto;position:relative}
+    .text-sidebar-nav{flex:1;padding:8px 0}
+    .tsb-group-header{display:flex;align-items:center;gap:6px;padding:10px 16px 6px;font-size:12.5px;font-weight:700;color:#333;cursor:pointer;user-select:none}
+    .tsb-group-header .ts-arrow{font-size:10px;color:#888;margin-right:2px}
+    .tsb-items li a{display:block;padding:8px 16px 8px 28px;font-size:13px;color:#555;cursor:pointer;transition:all .1s;border-left:3px solid transparent}
+    .tsb-items li a:hover{background:#f0f4ff;color:#1a73e8}
+    .tsb-items li a.active{background:#e8f0fe;color:#1a73e8;border-left-color:#1a73e8;font-weight:500}
+    .tsb-items.hidden{display:none}
+    .text-sidebar-collapse{display:flex;align-items:center;justify-content:flex-end;padding:8px 10px;border-top:1px solid #f0f0f0}
+    .text-sidebar-collapse button{background:none;border:none;color:#aaa;font-size:14px;cursor:pointer;padding:4px 8px;border-radius:4px}
+    .text-sidebar-collapse button:hover{background:#f0f0f0;color:#555}
+
+    /* === CONTENT === */
+    .content{flex:1;overflow-y:auto;background:#f5f6fa;position:relative}
+
+    /* === TOAST === */
+    .toast{position:fixed;top:62px;right:24px;background:#1e8e3e;color:#fff;border-radius:8px;padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.18);z-index:900;transition:opacity .4s,transform .4s}
+    .toast.hide{opacity:0;transform:translateY(-8px);pointer-events:none}
+    .toast i{font-size:16px}
+    .toast a{color:#b9f6ca;font-weight:600;margin-left:6px}
+    .toast a:hover{text-decoration:underline}
+    .toast-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:16px;cursor:pointer;margin-left:8px;line-height:1}
+    .toast-close:hover{color:#fff}
+
+    /* === PAGE HEADER === */
+    .page-header{padding:16px 28px 14px;background:#fff;border-bottom:1px solid #e8e8e8}
+    .breadcrumb{font-size:12.5px;color:#888;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+    .breadcrumb a{color:#1a73e8}
+    .breadcrumb a:hover{text-decoration:underline}
+    .breadcrumb .bc-sep{color:#ccc}
+    .breadcrumb .bc-current{color:#555}
+    .page-subtitle{font-size:13px;color:#666}
+
+    /* === APPROVAL SECTION CARD === */
+    .approval-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;margin:20px 28px;overflow:hidden}
+    .approval-row{display:flex;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid #f0f0f0}
+    .approval-row:last-child{border-bottom:none}
+    .approval-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .approval-icon.ai{background:#e8f0fe;color:#1a73e8}
+    .approval-icon.shield{background:#e8f5e9;color:#2e7d32}
+    .approval-icon.manual{background:#f3e5f5;color:#7b1fa2}
+    .approval-info{flex:1}
+    .approval-title{font-size:14px;font-weight:600;color:#333;display:flex;align-items:center;gap:8px;margin-bottom:3px}
+    .early-access-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#fff3e0;color:#e65100;border:1px solid #ffcc80}
+    .approval-desc{font-size:12.5px;color:#777}
+
+    /* === TOGGLE SWITCH === */
+    .toggle-switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;cursor:pointer}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+    .toggle-track{position:absolute;inset:0;background:#ccc;border-radius:12px;transition:background .2s}
+    .toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s}
+    .toggle-switch input:checked + .toggle-track{background:#1a73e8}
+    .toggle-switch input:checked ~ .toggle-thumb{transform:translateX(20px)}
+
+    /* === AI RULES AREA === */
+    .ai-rules-area{background:#f8f9fb;border-top:1px solid #f0f0f0;padding:16px 24px 20px}
+    .add-rule-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:13px;font-weight:500;border:1px solid #1a73e8;border-radius:4px;color:#1a73e8;background:#fff;cursor:pointer;margin-bottom:14px;transition:all .15s}
+    .add-rule-btn:hover{background:#e8f0fe}
+    .rules-grid{display:flex;gap:14px;flex-wrap:wrap}
+    .rule-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px 18px;min-width:240px;flex:1;max-width:320px;position:relative}
+    .rule-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .rule-card-title{font-size:13.5px;font-weight:600;color:#333}
+    .rule-menu-btn{background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 6px;border-radius:4px;line-height:1}
+    .rule-menu-btn:hover{background:#f0f0f0;color:#333}
+    .rule-meta{display:flex;flex-direction:column;gap:8px}
+    .rule-meta-row{display:flex;align-items:center;gap:8px;font-size:12.5px}
+    .rule-meta-label{color:#888;min-width:72px}
+    .rule-meta-tags{display:flex;gap:5px;flex-wrap:wrap}
+    .rule-tag{padding:2px 8px;border-radius:4px;background:#e8eaf6;font-size:11.5px;color:#333;font-weight:500}
+    .rule-tag.more{background:#f0f0f0;color:#666}
+    .rule-card-menu{display:none;position:absolute;top:36px;right:12px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:130px;z-index:100;padding:4px 0}
+    .rule-card.open .rule-card-menu{display:block}
+    .rule-card-menu a{display:block;padding:8px 16px;font-size:13px;color:#333;transition:background .1s}
+    .rule-card-menu a:hover{background:#f5f5f5}
+    .rule-card-menu a.danger{color:#d32f2f}
+
+    /* === EXISTING PATCHES SUB-SECTION === */
+    .existing-patches-row{display:flex;align-items:center;gap:20px;padding:14px 24px;background:#fafbfd;border-top:1px solid #f0f0f0}
+    .existing-patches-label{font-size:13px;color:#555;font-weight:500;min-width:180px}
+    .radio-group{display:flex;gap:20px;flex-wrap:wrap}
+    .radio-label{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer}
+    .radio-label input[type=radio]{accent-color:#1a73e8;width:15px;height:15px;cursor:pointer}
+    .radio-help{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1px solid #bbb;font-size:10px;color:#888;cursor:help;margin-left:2px}
+
+    /* === FORM ACTIONS === */
+    .form-actions-row{display:flex;align-items:center;gap:10px;padding:16px 24px;border-top:1px solid #f0f0f0}
+    .btn-save{padding:8px 22px;background:#1a73e8;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-save:hover{background:#1557b0}
+    .btn-cancel{padding:8px 18px;background:#fff;color:#333;border:1px solid #dadce0;border-radius:4px;font-size:13px;cursor:pointer;transition:all .15s}
+    .btn-cancel:hover{background:#f5f5f5}
+
+    /* === SCROLLBAR === */
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#c0c7d0;border-radius:3px}
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <span class="brand-icon"><i class="fa-solid fa-circle-notch"></i></span>
+        <span class="brand-text">Endpoint Central</span>
+      </div>
+    </div>
+    <nav class="topbar-nav">
+      <a href="#" class="topnav-item">Home</a>
+      <a href="#" class="topnav-item">Configurations</a>
+      <a href="#" class="topnav-item active">Threats &amp; Patches</a>
+      <a href="#" class="topnav-item">Software Deployment</a>
+      <a href="#" class="topnav-item">Inventory</a>
+      <a href="#" class="topnav-item">MDM</a>
+      <a href="#" class="topnav-item">Admin</a>
+      <a href="#" class="topnav-item">Tools</a>
+      <a href="#" class="topnav-item">Agent</a>
+      <a href="#" class="topnav-item">Browsers</a>
+      <a href="#" class="topnav-item">Application Control</a>
+      <a href="#" class="topnav-item">Malware Protection</a>
+      <div class="topnav-overflow" id="overflowBtn">
+        <span class="overflow-dots">•••</span>
+        <div class="overflow-menu" id="overflowMenu">
+          <a href="#">OS Deployment</a>
+          <a href="#">Tenable VM</a>
+          <a href="#">Compliance</a>
+        </div>
+      </div>
+    </nav>
+    <div class="topbar-right">
+      <a href="#" class="jump-sdp"><i class="fa fa-building"></i> Jump to SDP</a>
+      <div class="topbar-action" title="Search"><i class="fa fa-search"></i></div>
+      <div class="topbar-action" title="Shield"><i class="fa fa-shield-halved"></i></div>
+      <div class="topbar-action" title="Notifications"><i class="fa fa-bell"></i></div>
+      <div class="topbar-action" title="What's New"><i class="fa fa-bolt"></i></div>
+      <div class="topbar-action user-avatar" id="userMenu" style="position:relative">
+        <i class="fa fa-user-circle"></i>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="#"><i class="fa fa-user"></i> My Profile</a>
+          <a href="#"><i class="fa fa-key"></i> Change Password</a>
+          <hr />
+          <a href="#"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+      <div class="topbar-action" title="Apps"><i class="fa fa-th"></i></div>
+    </div>
+  </header>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fa fa-circle-check"></i>
+    <span>Autonomous Testing Rule created successfully.</span>
+    <a href="#">View Details</a>
+    <button class="toast-close" onclick="dismissToast()">&times;</button>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-wrapper">
+
+    <!-- ICON SIDEBAR -->
+    <aside class="icon-sidebar">
+      <div class="icon-sidebar-item">
+        <i class="fa fa-gauge"></i>
+        <span>Dashboard</span>
+      </div>
+      <div class="icon-sidebar-item">
+        <i class="fa fa-shield-halved"></i>
+        <span>Threats</span>
+      </div>
+      <div class="icon-sidebar-item" onclick="window.location.href='missing-patches.html'" title="Patches">
+        <i class="fa fa-file-shield"></i>
+        <span>Patches</span>
+      </div>
+      <div class="icon-sidebar-item">
+        <i class="fa fa-desktop"></i>
+        <span>Systems</span>
+      </div>
+      <div class="icon-sidebar-item active">
+        <i class="fa fa-rocket"></i>
+        <span>Deployment</span>
+      </div>
+      <div class="icon-sidebar-item">
+        <i class="fa fa-clipboard-check"></i>
+        <span>Compliance</span>
+      </div>
+      <div class="icon-sidebar-item">
+        <i class="fa fa-magnifying-glass-chart"></i>
+        <span>Tenable VM</span>
+      </div>
+      <div class="icon-sidebar-item">
+        <i class="fa fa-chart-bar"></i>
+        <span>Reports</span>
+      </div>
+      <div class="icon-sidebar-item">
+        <i class="fa fa-gear"></i>
+        <span>Settings</span>
+      </div>
+      <div class="icon-sidebar-item">
+        <i class="fa fa-arrows-rotate"></i>
+        <span>Update Now</span>
+      </div>
+    </aside>
+
+    <!-- TEXT NAV SIDEBAR -->
+    <aside class="text-sidebar">
+      <nav class="text-sidebar-nav">
+
+        <!-- Patches group -->
+        <div class="tsb-group-header" onclick="toggleTsbGroup('patchApprovalItems','patchApprovalArrow')">
+          <span class="ts-arrow" id="patchApprovalArrow">▸</span>
+          Patches
+        </div>
+        <ul class="tsb-items hidden" id="patchApprovalItems">
+          <li><a href="missing-patches.html">Missing Patches</a></li>
+          <li><a href="decline-patch.html">Decline Patch</a></li>
+        </ul>
+
+        <!-- Deployment group -->
+        <div class="tsb-group-header" onclick="toggleTsbGroup('deployItems','deployArrow')">
+          <span class="ts-arrow" id="deployArrow">▾</span>
+          Deployment
+        </div>
+        <ul class="tsb-items" id="deployItems">
+          <li><a href="#">Manual Deployment</a></li>
+          <li><a href="#" class="active">Patch Approval Settings</a></li>
+          <li><a href="#">Automate Patch Deployment</a></li>
+          <li><a href="#">Disable Automatic Updates</a></li>
+          <li><a href="#">Security Configurations</a></li>
+          <li><a href="#">Software Uninstallation</a></li>
+          <li><a href="#">Deployment Policies</a></li>
+          <li><a href="#">Script Repository</a></li>
+          <li><a href="#">Trash</a></li>
+        </ul>
+
+        <!-- Tools group -->
+        <div class="tsb-group-header" onclick="toggleTsbGroup('toolsItems','toolsArrow')">
+          <span class="ts-arrow" id="toolsArrow">▾</span>
+          Tools
+        </div>
+        <ul class="tsb-items" id="toolsItems">
+          <li><a href="#">Remote Shutdown</a></li>
+          <li><a href="#">Wake on LAN</a></li>
+        </ul>
+
+      </nav>
+      <div class="text-sidebar-collapse">
+        <button title="Collapse"><i class="fa fa-angle-double-left"></i></button>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="breadcrumb">
+          <a href="missing-patches.html">Threats &amp; Patches</a>
+          <span class="bc-sep">›</span>
+          <a href="#">Deployment</a>
+          <span class="bc-sep">›</span>
+          <span class="bc-current">Patch Approval Settings</span>
+        </div>
+        <div class="page-subtitle">Select and configure how patches should be approved</div>
+      </div>
+
+      <!-- Approval options card -->
+      <div class="approval-card">
+
+        <!-- Row 1: AI-Enhanced -->
+        <div class="approval-row" style="flex-wrap:wrap;gap:0;padding:0">
+          <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;width:100%">
+            <div class="approval-icon ai">
+              <i class="fa fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="approval-info">
+              <div class="approval-title">
+                AI-Enhanced Autonomous Testing and Approval
+                <span class="early-access-badge">Early Access</span>
+              </div>
+              <div class="approval-desc">AI-powered autonomous testing with intelligent risk analysis and automatic approval</div>
+            </div>
+            <label class="toggle-switch" title="Toggle AI-Enhanced mode">
+              <input type="checkbox" id="toggleAI" checked onchange="handleAIToggle(this)" />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+
+          <!-- AI rules area -->
+          <div class="ai-rules-area" id="aiRulesArea" style="width:100%">
+            <button class="add-rule-btn" onclick="showAddRuleModal()">
+              <i class="fa fa-plus"></i> Add Rule
+            </button>
+
+            <!-- Auto-decline block -->
+            <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px">
+              <label class="toggle-switch" style="margin-top:2px;flex-shrink:0" title="Auto-decline patches when reliability score drops below threshold">
+                <input type="checkbox" id="toggleAutoDecline" onchange="handleAutoDecline(this)" />
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-size:13px;font-weight:500;color:#333">Auto-decline patches if reliability score drops below</span>
+                  <select id="autoDeclineThreshold" disabled
+                    style="border:1px solid #dadce0;border-radius:4px;padding:3px 8px;font-size:13px;background:#fff;color:#333;cursor:not-allowed;opacity:.5">
+                    <option>3</option><option>4</option><option selected>5</option>
+                    <option>6</option><option>7</option><option>8</option>
+                  </select>
+                </div>
+                <div id="autoDeclineSubtext" style="font-size:12px;color:#777;margin-top:4px;line-height:1.5">
+                  Applies to all approved patches, regardless of approval method.
+                </div>
+              </div>
+            </div>
+
+            <div class="rules-grid">
+
+              <!-- Rule card 1 -->
+              <div class="rule-card" id="ruleCard1">
+                <div class="rule-card-header">
+                  <div class="rule-card-title">Win 10 - updates</div>
+                  <button class="rule-menu-btn" onclick="toggleRuleMenu('ruleCard1')">•••</button>
+                  <div class="rule-card-menu">
+                    <a href="#">Edit</a>
+                    <a href="#" class="danger">Delete</a>
+                  </div>
+                </div>
+                <div class="rule-meta">
+                  <div class="rule-meta-row">
+                    <span class="rule-meta-label">Severity</span>
+                    <div class="rule-meta-tags">
+                      <span class="rule-tag">Critical</span>
+                    </div>
+                  </div>
+                  <div class="rule-meta-row">
+                    <span class="rule-meta-label">Patch Type</span>
+                    <div class="rule-meta-tags">
+                      <span class="rule-tag">Service Packs</span>
+                      <span class="rule-tag">Feature Pac...</span>
+                      <span class="rule-tag more">+2</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rule card 2 -->
+              <div class="rule-card" id="ruleCard2">
+                <div class="rule-card-header">
+                  <div class="rule-card-title">Update critical patches</div>
+                  <button class="rule-menu-btn" onclick="toggleRuleMenu('ruleCard2')">•••</button>
+                  <div class="rule-card-menu">
+                    <a href="#">Edit</a>
+                    <a href="#" class="danger">Delete</a>
+                  </div>
+                </div>
+                <div class="rule-meta">
+                  <div class="rule-meta-row">
+                    <span class="rule-meta-label">Severity</span>
+                    <div class="rule-meta-tags">
+                      <span class="rule-tag">Critical</span>
+                    </div>
+                  </div>
+                  <div class="rule-meta-row">
+                    <span class="rule-meta-label">Patch Type</span>
+                    <div class="rule-meta-tags">
+                      <span class="rule-tag">Critical updates</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Approve without testing -->
+        <div class="approval-row">
+          <div class="approval-icon shield">
+            <i class="fa fa-shield"></i>
+          </div>
+          <div class="approval-info">
+            <div class="approval-title">Approve without testing</div>
+            <div class="approval-desc">Automatically approve and deploy patches without any testing</div>
+          </div>
+          <label class="toggle-switch" title="Toggle approve without testing">
+            <input type="checkbox" id="toggleNoTest" onchange="handleExclusiveToggle('toggleNoTest')" />
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <!-- Row 3: Manual Testing -->
+        <div class="approval-row" style="flex-wrap:wrap;gap:0;padding:0;border-bottom:none">
+          <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;width:100%">
+            <div class="approval-icon manual">
+              <i class="fa fa-user-gear"></i>
+            </div>
+            <div class="approval-info">
+              <div class="approval-title">Manual Testing and Approval</div>
+              <div class="approval-desc">Manually test patches before deploying to all computers</div>
+            </div>
+            <label class="toggle-switch" title="Toggle manual testing">
+              <input type="checkbox" id="toggleManual" onchange="handleManualToggle(this)" />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+
+          <!-- Sub-section: existing patches (shown when manual is ON) -->
+          <div class="existing-patches-row" id="existingPatchesRow" style="display:none;width:100%">
+            <span class="existing-patches-label">For the Existing Patches</span>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="existingPatches" value="retain" checked />
+                Retain Approval Status
+                <span class="radio-help" title="Keeps the current approval status for patches that were previously approved or declined">?</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="existingPatches" value="not-approved" />
+                Mark Patch as Not Approved
+                <span class="radio-help" title="Resets all existing patches to 'Not Approved', requiring manual re-approval">?</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Save / Cancel (shown when manual is ON) -->
+          <div class="form-actions-row" id="formActionsRow" style="display:none;width:100%">
+            <button class="btn-save">Save changes</button>
+            <button class="btn-cancel" onclick="cancelManual()">Cancel</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ADD RULE MODAL -->
+  <div id="addRuleOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:12px;width:640px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.28)">
+
+      <!-- Modal header -->
+      <div style="padding:20px 24px 16px;border-bottom:1px solid #e8e8e8;flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:16px;font-weight:700;color:#222">Create Autonomous Testing Rule</span>
+          <span style="background:#e65100;color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;letter-spacing:.3px">AI Powered</span>
+        </div>
+      </div>
+
+      <!-- Modal body (scrollable) -->
+      <div style="padding:20px 24px;overflow-y:auto;flex:1">
+
+        <!-- Rule Name -->
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <span style="font-size:13px;color:#555;font-weight:500;min-width:80px">Rule Name</span>
+          <input type="text" id="ruleNameInput" value="Update critical patches"
+            style="flex:1;padding:9px 14px;border:1px solid #dadce0;border-radius:6px;font-size:13px;color:#333;outline:none"
+            onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#dadce0'" />
+        </div>
+
+        <!-- Patch Reliability Score -->
+        <div style="background:#eef2fb;border-radius:10px;padding:18px 20px;margin-bottom:14px">
+          <div style="font-weight:700;font-size:13.5px;color:#222;margin-bottom:3px">Patch Reliability Score</div>
+          <div style="font-size:12.5px;color:#555;margin-bottom:16px">Approve when patch reliability score is greater than</div>
+
+          <!-- Slider row -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+            <div style="flex:1;position:relative">
+              <input type="range" id="reliabilitySlider" min="1" max="10" step="1" value="8"
+                oninput="updateSlider()"
+                style="width:100%;height:4px;-webkit-appearance:none;appearance:none;outline:none;border-radius:2px;cursor:pointer;
+                       background:linear-gradient(to right,#1a73e8 0%,#1a73e8 77.8%,#c8d0e0 77.8%,#c8d0e0 100%)" />
+            </div>
+            <button onclick="stepSlider(-1)"
+              style="width:28px;height:28px;border:1px solid #b0bec5;border-radius:5px;background:#fff;color:#1a73e8;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:600">&#8249;</button>
+            <button onclick="stepSlider(1)"
+              style="width:28px;height:28px;border:1px solid #b0bec5;border-radius:5px;background:#fff;color:#1a73e8;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:600">&#8250;</button>
+            <div id="sliderVal"
+              style="width:38px;height:30px;border:1px solid #b0bec5;border-radius:5px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#222;flex-shrink:0">8</div>
+          </div>
+
+          <!-- Maturity row -->
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#555;margin-bottom:14px">
+            <span>Reliability thresholds based on patch maturity</span>
+            <input type="number" value="1" min="1" max="365"
+              style="width:56px;padding:5px 8px;border:1px solid #b0bec5;border-radius:5px;font-size:13px;outline:none;text-align:center;background:#fff" />
+            <select style="padding:5px 10px;border:1px solid #b0bec5;border-radius:5px;font-size:13px;background:#fff;outline:none;cursor:pointer">
+              <option>Days</option><option>Weeks</option><option>Months</option>
+            </select>
+          </div>
+
+          <!-- Note -->
+          <div style="font-size:12px;color:#444;line-height:1.55">
+            <strong>Note:</strong> It analyzes parameters like deployment success, failure, and uninstall rates to determine the score and find anomalies.
+          </div>
+        </div>
+
+        <!-- Security Updates -->
+        <div style="border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <span style="font-weight:700;font-size:13px;color:#222">Security Updates</span>
+            <a href="#" style="color:#1a73e8;font-size:13px;font-weight:500" onclick="selectAll('.sec-cb',event)">Select all</a>
+          </div>
+          <div style="display:flex;gap:22px;flex-wrap:wrap">
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="sec-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Critical</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="sec-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Important</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="sec-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Moderate</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="sec-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Low</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="sec-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Unrated</label>
+          </div>
+        </div>
+
+        <!-- Patch Types -->
+        <div style="border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <span style="font-weight:700;font-size:13px;color:#222">Patch Types</span>
+            <a href="#" style="color:#1a73e8;font-size:13px;font-weight:500" onclick="selectAll('.pt-cb',event)">Select all</a>
+          </div>
+          <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px">
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="pt-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Critical Updates</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="pt-cb" checked style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Service Packs</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="pt-cb" checked style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Feature Packs</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="pt-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Rollups</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="pt-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Preview Rollups</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="pt-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Optional Updates</label>
+          </div>
+          <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px">
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="pt-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Driver Updates</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="checkbox" class="pt-cb" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Bios Updates</label>
+          </div>
+          <div style="border-top:1px solid #f0f0f0;padding-top:12px;display:flex;gap:22px;flex-wrap:wrap">
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="radio" name="appScope" value="all" checked style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> All Application</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="radio" name="appScope" value="specific" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> Specific Application</label>
+            <label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer"><input type="radio" name="appScope" value="except" style="width:15px;height:15px;accent-color:#1a73e8;cursor:pointer"> All Application except</label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal footer -->
+      <div style="display:flex;justify-content:center;gap:12px;padding:16px 24px;border-top:1px solid #f0f0f0;flex-shrink:0">
+        <button onclick="createRule()"
+          style="padding:10px 32px;background:#1a73e8;color:#fff;border:none;border-radius:6px;font-size:13.5px;font-weight:600;cursor:pointer;transition:background .15s"
+          onmouseover="this.style.background='#1557b0'" onmouseout="this.style.background='#1a73e8'">Create Rule</button>
+        <button onclick="closeAddRuleModal()"
+          style="padding:10px 24px;background:#fff;color:#333;border:1px solid #dadce0;border-radius:6px;font-size:13.5px;cursor:pointer;transition:background .15s"
+          onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* ===== TOAST ===== */
+    setTimeout(() => document.getElementById('toast').classList.add('hide'), 5000);
+    function dismissToast() { document.getElementById('toast').classList.add('hide'); }
+
+    /* ===== OVERFLOW / USER DROPDOWN ===== */
+    document.getElementById('overflowBtn').addEventListener('click', e => {
+      e.stopPropagation();
+      const m = document.getElementById('overflowMenu');
+      m.classList.toggle('open');
+      document.getElementById('userDropdown').classList.remove('open');
+    });
+    document.getElementById('userMenu').addEventListener('click', e => {
+      e.stopPropagation();
+      const d = document.getElementById('userDropdown');
+      d.classList.toggle('open');
+      document.getElementById('overflowMenu').classList.remove('open');
+    });
+    document.addEventListener('click', () => {
+      document.getElementById('overflowMenu').classList.remove('open');
+      document.getElementById('userDropdown').classList.remove('open');
+      document.querySelectorAll('.rule-card.open').forEach(c => c.classList.remove('open'));
+    });
+
+    /* ===== TEXT SIDEBAR GROUPS ===== */
+    function toggleTsbGroup(itemsId, arrowId) {
+      const items = document.getElementById(itemsId);
+      const arrow = document.getElementById(arrowId);
+      const isOpen = !items.classList.contains('hidden');
+      items.classList.toggle('hidden', isOpen);
+      arrow.textContent = isOpen ? '▸' : '▾';
+    }
+
+    /* ===== AI TOGGLE ===== */
+    function handleAIToggle(cb) {
+      document.getElementById('aiRulesArea').style.display = cb.checked ? 'block' : 'none';
+      if (cb.checked) {
+        document.getElementById('toggleNoTest').checked = false;
+        document.getElementById('toggleManual').checked = false;
+        document.getElementById('existingPatchesRow').style.display = 'none';
+        document.getElementById('formActionsRow').style.display = 'none';
+      }
+    }
+
+    /* ===== APPROVE WITHOUT TESTING TOGGLE ===== */
+    function handleExclusiveToggle(id) {
+      const cb = document.getElementById(id);
+      if (cb.checked) {
+        document.getElementById('toggleAI').checked = false;
+        document.getElementById('aiRulesArea').style.display = 'none';
+        document.getElementById('toggleManual').checked = false;
+        document.getElementById('existingPatchesRow').style.display = 'none';
+        document.getElementById('formActionsRow').style.display = 'none';
+      }
+    }
+
+    /* ===== MANUAL TOGGLE ===== */
+    function handleManualToggle(cb) {
+      const epRow = document.getElementById('existingPatchesRow');
+      const faRow = document.getElementById('formActionsRow');
+      if (cb.checked) {
+        document.getElementById('toggleAI').checked = false;
+        document.getElementById('aiRulesArea').style.display = 'none';
+        document.getElementById('toggleNoTest').checked = false;
+        epRow.style.display = 'flex';
+        faRow.style.display = 'flex';
+      } else {
+        epRow.style.display = 'none';
+        faRow.style.display = 'none';
+      }
+    }
+
+    function cancelManual() {
+      document.getElementById('toggleManual').checked = false;
+      document.getElementById('existingPatchesRow').style.display = 'none';
+      document.getElementById('formActionsRow').style.display = 'none';
+    }
+
+    /* ===== RULE CARD MENU ===== */
+    function toggleRuleMenu(cardId) {
+      event.stopPropagation();
+      const card = document.getElementById(cardId);
+      const wasOpen = card.classList.contains('open');
+      document.querySelectorAll('.rule-card.open').forEach(c => c.classList.remove('open'));
+      if (!wasOpen) card.classList.add('open');
+    }
+
+    /* ===== ADD RULE MODAL ===== */
+    function showAddRuleModal() {
+      document.getElementById('addRuleOverlay').style.display = 'flex';
+    }
+    function closeAddRuleModal() {
+      document.getElementById('addRuleOverlay').style.display = 'none';
+    }
+    document.getElementById('addRuleOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeAddRuleModal();
+    });
+
+    /* ===== SLIDER ===== */
+    function updateSlider() {
+      const s = document.getElementById('reliabilitySlider');
+      const v = parseInt(s.value);
+      document.getElementById('sliderVal').textContent = v;
+      const pct = ((v - 1) / 9) * 100;
+      s.style.background = `linear-gradient(to right,#1a73e8 0%,#1a73e8 ${pct}%,#c8d0e0 ${pct}%,#c8d0e0 100%)`;
+    }
+    function stepSlider(delta) {
+      const s = document.getElementById('reliabilitySlider');
+      s.value = Math.min(10, Math.max(1, parseInt(s.value) + delta));
+      updateSlider();
+    }
+
+    /* ===== SELECT ALL ===== */
+    function selectAll(selector, e) {
+      e.preventDefault();
+      document.querySelectorAll(selector).forEach(cb => cb.checked = true);
+    }
+
+    /* ===== AUTO-DECLINE TOGGLE ===== */
+    function handleAutoDecline(cb) {
+      const threshold = document.getElementById('autoDeclineThreshold');
+      const subtext   = document.getElementById('autoDeclineSubtext');
+      threshold.disabled = !cb.checked;
+      threshold.style.opacity  = cb.checked ? '1'   : '.5';
+      threshold.style.cursor   = cb.checked ? 'pointer' : 'not-allowed';
+      if (cb.checked) {
+        updateAutoDeclineSubtext();
+        threshold.addEventListener('change', updateAutoDeclineSubtext);
+      } else {
+        subtext.style.color = '#777';
+        subtext.textContent = 'Applies to all approved patches, regardless of approval method.';
+      }
+    }
+    function updateAutoDeclineSubtext() {
+      const val     = document.getElementById('autoDeclineThreshold').value;
+      const subtext = document.getElementById('autoDeclineSubtext');
+      subtext.style.color   = '#1a73e8';
+      subtext.textContent   = `Active — patches scoring below ${val} will be automatically declined, even if previously approved.`;
+    }
+
+    /* ===== CREATE RULE ===== */
+    function createRule() {
+      const name = document.getElementById('ruleNameInput').value.trim();
+      if (!name) { document.getElementById('ruleNameInput').style.borderColor = '#d32f2f'; return; }
+      closeAddRuleModal();
+      const toast = document.getElementById('toast');
+      toast.querySelector('span').textContent = 'Autonomous Testing Rule created successfully.';
+      toast.classList.remove('hide');
+      setTimeout(() => toast.classList.add('hide'), 5000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Group & Decline Patch — Endpoint Central</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* === RESET === */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:14px}
+    body{font-family:'Lato','Segoe UI',Roboto,Arial,sans-serif;background:#f5f6fa;color:#333;overflow:hidden;height:100vh}
+    a{text-decoration:none;color:inherit}
+    ul{list-style:none}
+    hr{border:none;border-top:1px solid #e4e4e4;margin:4px 0}
+    button{font-family:inherit;cursor:pointer}
+
+    /* === TOPBAR === */
+    .topbar{display:flex;align-items:center;height:48px;background:#222;color:#fff;padding:0 0 0 12px;position:fixed;top:0;left:0;right:0;z-index:1000}
+    .topbar-left{display:flex;align-items:center;gap:8px;padding-right:12px}
+    .brand{display:flex;align-items:center;gap:8px}
+    .brand-icon{font-size:22px;background:linear-gradient(135deg,#e53935,#f9a825,#43a047,#1e88e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .brand-text{font-size:14px;font-weight:600;white-space:nowrap;color:#fff}
+    .topbar-nav{display:flex;align-items:center;height:100%;flex:1;overflow:hidden}
+    .topnav-item{padding:0 13px;height:48px;display:flex;align-items:center;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.7);border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;cursor:pointer}
+    .topnav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .topnav-item.active{color:#fff;border-bottom-color:#4d90fe;background:rgba(77,144,254,.15)}
+    .topnav-overflow{position:relative;height:48px;display:flex;align-items:center}
+    .overflow-dots{padding:0 12px;height:48px;display:flex;align-items:center;font-size:16px;letter-spacing:2px;color:rgba(255,255,255,.7);cursor:pointer;font-weight:bold}
+    .overflow-dots:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .overflow-menu{display:none;position:absolute;top:48px;left:0;background:#fff;color:#333;border-radius:0 0 8px 8px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:180px;z-index:1100;overflow:hidden}
+    .overflow-menu.open{display:block}
+    .overflow-menu a{display:block;padding:10px 18px;font-size:13px;color:#333;transition:background .1s}
+    .overflow-menu a:hover{background:#f0f4ff;color:#1a73e8}
+    .topbar-right{display:flex;align-items:center;gap:2px;margin-left:auto;padding-right:8px;flex-shrink:0}
+    .trial-btn{background:#4d90fe;color:#fff;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap;margin-right:4px}
+    .trial-btn:hover{background:#3b7ddb}
+    .jump-sdp{display:flex;align-items:center;gap:4px;padding:6px 10px;font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap;border:1px solid rgba(255,255,255,.2);border-radius:4px;margin-right:4px}
+    .jump-sdp:hover{color:#fff}
+    .topbar-action{padding:8px 10px;cursor:pointer;border-radius:4px;font-size:15px;position:relative;color:rgba(255,255,255,.7);transition:background .15s}
+    .topbar-action:hover{background:rgba(255,255,255,.1);color:#fff}
+    .user-avatar{font-size:20px}
+    .user-dropdown{display:none;position:absolute;top:44px;right:0;background:#fff;color:#333;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:180px;z-index:1100;overflow:hidden}
+    .user-dropdown.open{display:block}
+    .user-dropdown a{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;transition:background .1s;color:#333}
+    .user-dropdown a:hover{background:#f5f7fa}
+
+    /* === LAYOUT === */
+    .main-wrapper{display:flex;margin-top:48px;height:calc(100vh - 48px)}
+
+    /* === ICON SIDEBAR === */
+    .icon-sidebar{width:68px;min-width:68px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;align-items:center;padding:8px 0;overflow-y:auto}
+    .icon-sb-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:54px;padding:9px 4px;border-radius:8px;cursor:pointer;color:#666;transition:all .15s;margin-bottom:2px}
+    .icon-sb-item i{font-size:17px}
+    .icon-sb-item span{font-size:9.5px;text-align:center;line-height:1.2;font-weight:500}
+    .icon-sb-item:hover{background:#f0f4ff;color:#1a73e8}
+    .icon-sb-item.active{background:#e8f0fe;color:#1a73e8}
+
+    /* === TEXT NAV SIDEBAR === */
+    .text-sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;overflow-y:auto;position:relative}
+    .text-sidebar-nav{flex:1;padding:8px 0}
+    .tsb-group-header{display:flex;align-items:center;gap:5px;padding:10px 16px 6px;font-size:12.5px;font-weight:700;color:#333;cursor:pointer;user-select:none}
+    .tsb-arrow{font-size:10px;color:#555}
+    .tsb-items li a{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 8px 26px;font-size:13px;color:#555;cursor:pointer;transition:all .1s;border-left:3px solid transparent}
+    .tsb-items li a:hover{background:#f0f4ff;color:#1a73e8}
+    .tsb-items li a.active{background:#e8f0fe;color:#1a73e8;border-left-color:#1a73e8;font-weight:500}
+    .tsb-items.hidden{display:none}
+    .nav-badge{display:inline-flex;align-items:center;justify-content:center;background:#757575;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;min-width:20px}
+    .tsb-collapse{display:flex;align-items:center;justify-content:flex-end;padding:8px 10px;border-top:1px solid #f0f0f0}
+    .tsb-collapse button{background:none;border:none;color:#aaa;font-size:14px;cursor:pointer;padding:4px 8px;border-radius:4px}
+    .tsb-collapse button:hover{background:#f0f0f0;color:#555}
+
+    /* === CONTENT === */
+    .content{flex:1;overflow-y:auto;background:#f5f6fa;padding:20px 28px}
+
+    /* === BREADCRUMB === */
+    .breadcrumb{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#888;margin-bottom:10px}
+    .breadcrumb a{color:#888}
+    .breadcrumb a:hover{color:#1a73e8;text-decoration:underline}
+    .breadcrumb .bc-sep{color:#bbb}
+    .breadcrumb .bc-current{color:#333;font-weight:500}
+    .page-title{font-size:15px;font-weight:700;color:#222;margin-bottom:16px}
+
+    /* === WIZARD CARD === */
+    .wizard-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;display:flex;min-height:380px}
+
+    /* === STEPPER === */
+    .stepper{width:200px;min-width:200px;border-right:1px solid #ebebeb;padding:20px 0;display:flex;flex-direction:column;gap:0}
+    .step-item{padding:18px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;border-left:3px solid transparent;cursor:pointer;transition:background .1s;position:relative}
+    .step-item.visited{border-left-color:#1a73e8}
+    .step-item:hover{background:#fafbfd}
+    .step-icon-wrap{position:relative;display:inline-flex}
+    .step-icon-wrap .step-icon{font-size:36px;color:#555;line-height:1}
+    .step-badge{position:absolute;bottom:-4px;right:-6px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid #fff}
+    .step-badge.red{background:#e53935;color:#fff}
+    .step-badge.green{background:#2e7d32;color:#fff}
+    .step-label{font-size:12px;font-weight:500;color:#333;text-align:center;line-height:1.4}
+
+    /* === RIGHT PANEL === */
+    .wizard-right{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+    /* === TABS === */
+    .wizard-tabs{display:flex;gap:0;border-bottom:2px solid #e8e8e8;padding:0 20px}
+    .wizard-tab{padding:12px 18px;font-size:13px;font-weight:500;color:#666;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+    .wizard-tab:hover{color:#1a73e8}
+    .wizard-tab.active{color:#1a73e8;border-bottom-color:#1a73e8;font-weight:600}
+
+    /* === TAB TOOLBAR === */
+    .tab-toolbar{display:flex;align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid #f0f0f0;flex-wrap:wrap}
+    .btn-add-patches{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:13px;font-weight:500;border:1px solid #dadce0;border-radius:4px;background:#fff;color:#333;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .btn-add-patches:hover{background:#f8f9fa;border-color:#bbb}
+    .filter-dropdown{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:13px;border:1px solid #dadce0;border-radius:4px;background:#fff;color:#333;cursor:pointer;white-space:nowrap}
+    .filter-dropdown:hover{background:#f8f9fa}
+    .filter-dropdown i{font-size:11px;color:#888}
+    .tab-toolbar-right{margin-left:auto;display:flex;align-items:center;gap:4px}
+    .total-label{font-size:13px;color:#1a73e8;font-weight:500}
+    .icon-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:#555;font-size:13px}
+    .icon-btn:hover{background:#f0f0f0}
+
+    /* === TABLE === */
+    .tab-table-wrap{overflow-x:auto;flex:1}
+    table.data-table{width:100%;border-collapse:collapse;min-width:700px}
+    table.data-table th{background:#f8f9fa;font-size:12px;font-weight:600;color:#5f6368;padding:10px 16px;text-align:left;border-bottom:1px solid #e8e8e8;white-space:nowrap}
+    table.data-table th .sort-icon{margin-left:4px;font-size:10px;color:#888}
+    table.data-table td{padding:12px 16px;font-size:13px;border-bottom:1px solid #f0f0f0;color:#333}
+    .empty-state{text-align:center;padding:36px 20px;font-size:13px;color:#777}
+
+    /* === TAB PAGINATION === */
+    .tab-pagination{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:8px 16px;font-size:12.5px;color:#555;border-top:1px solid #f0f0f0}
+    .tab-pagination .total-text{margin-right:6px}
+    .tab-pagination .total-text a{color:#1a73e8}
+    .page-nav{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:1px solid #dadce0;border-radius:4px;cursor:pointer;color:#555;font-size:12px;background:#fff}
+    .page-nav:hover{background:#f0f0f0}
+    .per-page{padding:3px 6px;border:1px solid #dadce0;border-radius:4px;font-size:12.5px;background:#fff;cursor:pointer;outline:none}
+
+    /* === NOTE === */
+    .wizard-note{font-size:12.5px;color:#666;padding:12px 20px 0;line-height:1.5}
+
+    /* === WIZARD FOOTER === */
+    .wizard-footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:20px 0 4px}
+    .btn-prev{padding:8px 22px;background:#fff;color:#333;border:1px solid #dadce0;border-radius:5px;font-size:13px;cursor:pointer;transition:background .15s}
+    .btn-prev:hover{background:#f5f5f5}
+    .btn-next{padding:8px 28px;background:#1a73e8;color:#fff;border:none;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-next:hover{background:#1557b0}
+    .btn-cancel{padding:8px 22px;background:#fff;color:#333;border:1px solid #dadce0;border-radius:5px;font-size:13px;cursor:pointer;transition:background .15s}
+    .btn-cancel:hover{background:#f5f5f5}
+
+    /* === SCROLLBAR === */
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#c0c7d0;border-radius:3px}
+
+    /* === AUTO-DECLINE CARD === */
+    .auto-decline-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:14px 18px;margin:16px 0 0;display:flex;align-items:flex-start;gap:14px}
+    .adc-label{font-size:13px;font-weight:500;color:#333}
+    .adc-subtext{font-size:12px;color:#777;margin-top:4px;line-height:1.5}
+    .toggle-switch{position:relative;display:inline-flex;align-items:center;cursor:pointer}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+    .toggle-track{width:36px;height:20px;background:#ccc;border-radius:10px;transition:background .2s}
+    .toggle-thumb{position:absolute;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+    .toggle-switch input:checked ~ .toggle-track{background:#1a73e8}
+    .toggle-switch input:checked ~ .toggle-thumb{transform:translateX(16px)}
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <span class="brand-icon"><i class="fa-solid fa-circle-notch"></i></span>
+        <span class="brand-text">Endpoint Central</span>
+      </div>
+    </div>
+    <nav class="topbar-nav">
+      <a href="#" class="topnav-item">Home</a>
+      <a href="#" class="topnav-item">Configurations</a>
+      <a href="#" class="topnav-item active">Threats &amp; Patches</a>
+      <a href="#" class="topnav-item">Software Deployment</a>
+      <a href="#" class="topnav-item">Inventory</a>
+      <a href="#" class="topnav-item">Agent</a>
+      <div class="topnav-overflow" id="overflowBtn">
+        <span class="overflow-dots">•••</span>
+        <div class="overflow-menu" id="overflowMenu">
+          <a href="#">OS Deployment</a><a href="#">MDM</a>
+          <a href="#">Tools</a><a href="#">Admin</a><a href="#">Browsers</a>
+        </div>
+      </div>
+    </nav>
+    <div class="topbar-right">
+      <a href="#" class="trial-btn">Start your 30 days free trial</a>
+      <a href="#" class="jump-sdp"><i class="fa fa-circle" style="font-size:10px;color:#4d90fe"></i> Jump to SDP</a>
+      <div class="topbar-action" title="Search"><i class="fa fa-search"></i></div>
+      <div class="topbar-action" title="Notifications"><i class="fa fa-bell"></i></div>
+      <div class="topbar-action" title="What's New"><i class="fa fa-bolt"></i></div>
+      <div class="topbar-action user-avatar" id="userMenu" style="position:relative">
+        <i class="fa fa-user-circle"></i>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="#"><i class="fa fa-user"></i> My Profile</a>
+          <a href="#"><i class="fa fa-key"></i> Change Password</a>
+          <hr />
+          <a href="#"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+      <div class="topbar-action" title="Apps"><i class="fa fa-th"></i></div>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-wrapper">
+
+    <!-- ICON SIDEBAR -->
+    <aside class="icon-sidebar">
+      <div class="icon-sb-item"><i class="fa fa-gauge"></i><span>Dashboard</span></div>
+      <div class="icon-sb-item"><i class="fa fa-shield-halved"></i><span>Threats</span></div>
+      <div class="icon-sb-item active"><i class="fa fa-file-shield"></i><span>Patches</span></div>
+      <div class="icon-sb-item"><i class="fa fa-desktop"></i><span>Systems</span></div>
+      <div class="icon-sb-item" onclick="window.location.href='patch-approval-settings.html'" title="Deployment"><i class="fa fa-rocket"></i><span>Deployment</span></div>
+      <div class="icon-sb-item"><i class="fa fa-clipboard-check"></i><span>Compliance</span></div>
+      <div class="icon-sb-item"><i class="fa fa-chart-bar"></i><span>Reports</span></div>
+      <div class="icon-sb-item"><i class="fa fa-gear"></i><span>Settings</span></div>
+      <div class="icon-sb-item"><i class="fa fa-arrows-rotate"></i><span>Update Now</span></div>
+    </aside>
+
+    <!-- TEXT NAV SIDEBAR -->
+    <aside class="text-sidebar">
+      <nav class="text-sidebar-nav">
+        <div class="tsb-group-header">
+          <span class="tsb-arrow">▾</span> Patches
+        </div>
+        <ul class="tsb-items">
+          <li><a href="missing-patches.html"><span>Missing Patches</span><span class="nav-badge">316</span></a></li>
+          <li><a href="#"><span>Installed Patches</span><span class="nav-badge">81</span></a></li>
+          <li><a href="#"><span>Applicable Patches</span><span class="nav-badge">397</span></a></li>
+          <li><a href="#"><span>Top-Priority Patches</span></a></li>
+          <li><a href="#"><span>Supported Patches</span><span class="nav-badge">554388</span></a></li>
+          <li><a href="#"><span>Latest Patches</span><span class="nav-badge">78203</span></a></li>
+          <li><a href="#"><span>Detailed View</span></a></li>
+          <li><a href="#"><span>Downloaded Patches</span></a></li>
+          <li><a href="decline-patch.html" class="active"><span>Decline Patch</span></a></li>
+        </ul>
+        <div class="tsb-group-header">
+          <span class="tsb-arrow">▾</span> Attention Required
+        </div>
+        <ul class="tsb-items">
+          <li><a href="#"><span>Upload Pending</span><span class="nav-badge" style="background:#e53935">1</span></a></li>
+        </ul>
+        <div class="tsb-group-header">
+          <span class="tsb-arrow">▸</span> Deployment
+        </div>
+        <ul class="tsb-items hidden">
+          <li><a href="patch-approval-settings.html"><span>Patch Approval Settings</span></a></li>
+        </ul>
+      </nav>
+      <div class="tsb-collapse">
+        <button title="Collapse"><i class="fa fa-angle-double-left"></i></button>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="#">Threats &amp; Patches</a>
+        <span class="bc-sep">›</span>
+        <a href="#">Patches</a>
+        <span class="bc-sep">›</span>
+        <a href="decline-patch.html">Decline Patch</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Select Group &amp; Decline Patch</span>
+      </div>
+
+      <div class="page-title">Select Group &amp; Decline Patch</div>
+
+      <!-- Wizard card -->
+      <div class="wizard-card">
+
+        <!-- Stepper -->
+        <div class="stepper">
+
+          <div class="step-item visited" onclick="setStep(1)">
+            <div class="step-icon-wrap">
+              <i class="fa fa-desktop step-icon"></i>
+              <span class="step-badge red"><i class="fa fa-xmark" style="font-size:7px"></i></span>
+            </div>
+            <div class="step-label">Select Custom Group</div>
+          </div>
+
+          <div class="step-item visited" onclick="setStep(2)">
+            <div class="step-icon-wrap" style="position:relative">
+              <!-- stacked list icon manually -->
+              <span style="font-size:36px;color:#555;line-height:1;position:relative;display:inline-block">
+                <i class="fa fa-file-lines"></i>
+              </span>
+              <span class="step-badge red"><i class="fa fa-xmark" style="font-size:7px"></i></span>
+            </div>
+            <div class="step-label">Select Patches, Applications &amp; Families</div>
+          </div>
+
+          <div class="step-item" onclick="setStep(3)">
+            <div class="step-icon-wrap">
+              <i class="fa fa-clipboard-list step-icon"></i>
+              <span class="step-badge green"><i class="fa fa-check" style="font-size:7px"></i></span>
+            </div>
+            <div class="step-label">Summary Details</div>
+          </div>
+
+        </div>
+
+        <!-- Right panel -->
+        <div class="wizard-right">
+
+          <!-- Tabs -->
+          <div class="wizard-tabs">
+            <div class="wizard-tab active" onclick="switchTab(this,'patches-panel')">Patches</div>
+            <div class="wizard-tab" onclick="switchTab(this,'apps-panel')">Applications</div>
+            <div class="wizard-tab" onclick="switchTab(this,'family-panel')">Family</div>
+          </div>
+
+          <!-- ===== PATCHES TAB ===== -->
+          <div id="patches-panel">
+            <!-- Toolbar -->
+            <div class="tab-toolbar">
+              <button class="btn-add-patches" onclick="openAddPatch()">
+                <i class="fa fa-plus"></i> Add Patches
+              </button>
+              <div class="filter-dropdown" onclick="toggleFilter('familyFilter')">
+                Family <i class="fa fa-chevron-down" id="familyFilter" style="transition:transform .15s"></i>
+              </div>
+              <div class="filter-dropdown" onclick="toggleFilter('ptypeFilter')">
+                Patch Type <i class="fa fa-chevron-down" id="ptypeFilter" style="transition:transform .15s"></i>
+              </div>
+              <div class="filter-dropdown" onclick="toggleFilter('appFilter')">
+                Application <i class="fa fa-chevron-down" id="appFilter" style="transition:transform .15s"></i>
+              </div>
+              <div class="tab-toolbar-right">
+                <span class="total-label">Total Records |</span>
+                <div class="icon-btn" title="Search"><i class="fa fa-search"></i></div>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="tab-table-wrap">
+              <table class="data-table" id="patchesTable">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" id="selectAllPatches" style="accent-color:#1a73e8" /></th>
+                    <th>Patch ID</th>
+                    <th>Bulletin ID</th>
+                    <th>KB Number</th>
+                    <th>Platform</th>
+                    <th>Approve Status <i class="fa fa-arrow-up sort-icon"></i></th>
+                    <th>Patch Description</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="patchesTableBody">
+                  <tr>
+                    <td colspan="8" class="empty-state">
+                      No Supported Patches found based on the specified criteria
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="tab-pagination">
+              <span class="total-text">0 – 0 of <a href="#">Total Records</a></span>
+              <div class="page-nav">&#8249;</div>
+              <select class="per-page">
+                <option>25</option><option>50</option><option>100</option>
+              </select>
+              <div class="page-nav">&#8250;</div>
+            </div>
+
+            <!-- Note -->
+            <div class="wizard-note">
+              <strong>Note:</strong> If you wish to decline the superseded patches, select and decline them manually or decline the entire application/family.
+            </div>
+          </div>
+
+          <!-- ===== APPLICATIONS TAB ===== -->
+          <div id="apps-panel" style="display:none">
+            <div class="tab-toolbar">
+              <button class="btn-add-patches"><i class="fa fa-plus"></i> Add Applications</button>
+              <div class="tab-toolbar-right">
+                <span class="total-label">Total Records |</span>
+                <div class="icon-btn"><i class="fa fa-search"></i></div>
+              </div>
+            </div>
+            <div class="tab-table-wrap">
+              <table class="data-table">
+                <thead><tr>
+                  <th><input type="checkbox" style="accent-color:#1a73e8" /></th>
+                  <th>Application Name</th><th>Version</th><th>Vendor</th><th>Platform</th><th>Action</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td colspan="6" class="empty-state">No Applications found based on the specified criteria</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pagination">
+              <span class="total-text">0 – 0 of <a href="#">Total Records</a></span>
+              <div class="page-nav">&#8249;</div>
+              <select class="per-page"><option>25</option><option>50</option></select>
+              <div class="page-nav">&#8250;</div>
+            </div>
+          </div>
+
+          <!-- ===== FAMILY TAB ===== -->
+          <div id="family-panel" style="display:none">
+            <div class="tab-toolbar">
+              <button class="btn-add-patches"><i class="fa fa-plus"></i> Add Family</button>
+              <div class="tab-toolbar-right">
+                <span class="total-label">Total Records |</span>
+                <div class="icon-btn"><i class="fa fa-search"></i></div>
+              </div>
+            </div>
+            <div class="tab-table-wrap">
+              <table class="data-table">
+                <thead><tr>
+                  <th><input type="checkbox" style="accent-color:#1a73e8" /></th>
+                  <th>Family Name</th><th>Patch Count</th><th>Platform</th><th>Action</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td colspan="5" class="empty-state">No Families found based on the specified criteria</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pagination">
+              <span class="total-text">0 – 0 of <a href="#">Total Records</a></span>
+              <div class="page-nav">&#8249;</div>
+              <select class="per-page"><option>25</option><option>50</option></select>
+              <div class="page-nav">&#8250;</div>
+            </div>
+          </div>
+
+        </div><!-- /wizard-right -->
+      </div><!-- /wizard-card -->
+
+      <!-- Auto-decline settings card -->
+      <div class="auto-decline-card">
+        <label class="toggle-switch" style="margin-top:2px;flex-shrink:0">
+          <input type="checkbox" id="toggleAutoDecline" onchange="handleAutoDecline(this)" />
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="adc-label">Auto-decline patches if reliability score drops below</span>
+            <select id="autoDeclineThreshold" disabled
+              style="border:1px solid #dadce0;border-radius:4px;padding:3px 8px;font-size:13px;background:#fff;outline:none;opacity:.5;cursor:not-allowed">
+              <option>3</option><option>4</option><option selected>5</option>
+              <option>6</option><option>7</option><option>8</option>
+            </select>
+          </div>
+          <div id="autoDeclineSubtext" class="adc-subtext">
+            Patches which are manually approved will not be auto-declined, even if their reliability score drops below the specified threshold.
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer actions -->
+      <div class="wizard-footer">
+        <button class="btn-prev" onclick="history.back()">Previous</button>
+        <button class="btn-next" onclick="goNext()">Next</button>
+        <button class="btn-cancel" onclick="window.location.href='decline-patch.html'">Cancel</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ADD PATCHES MODAL -->
+  <div id="addPatchOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:2000;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:10px;width:560px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 36px rgba(0,0,0,.22)">
+      <div style="padding:16px 20px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:15px;font-weight:700;color:#222">Add Patches to Decline</span>
+        <button onclick="closeAddPatch()" style="background:none;border:none;font-size:18px;color:#888;cursor:pointer">&times;</button>
+      </div>
+      <div style="padding:16px 20px;overflow-y:auto;flex:1">
+        <div style="position:relative;margin-bottom:12px">
+          <i class="fa fa-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#aaa;font-size:12px"></i>
+          <input type="text" id="addPatchSearch" placeholder="Search by Patch ID, Bulletin ID or description…"
+            oninput="filterAddPatches()"
+            style="width:100%;padding:8px 12px 8px 32px;border:1px solid #dadce0;border-radius:5px;font-size:13px;outline:none" />
+        </div>
+        <div style="border:1px solid #e0e0e0;border-radius:6px;max-height:280px;overflow-y:auto" id="addPatchList"></div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:10px">
+        <button onclick="closeAddPatch()" style="padding:8px 18px;border:1px solid #dadce0;border-radius:5px;font-size:13px;background:#fff;cursor:pointer">Cancel</button>
+        <button onclick="confirmAddPatches()" style="padding:8px 22px;background:#1a73e8;color:#fff;border:none;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer">Add Selected</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ===== PATCHES DATA ===== */
+    const ALL_PATCHES = [
+      { id:'17268',  bulletin:'MS15-028',  kb:'KB3030377', platform:'Windows', status:'Not Approved', desc:'Security Update for Windows 8 (KB3030377)',            sev:'warning'  },
+      { id:'8584',   bulletin:'MS10-033',  kb:'KB979482',  platform:'Windows', status:'Not Approved', desc:'Security Update for Windows 7 (KB979482)',             sev:'critical' },
+      { id:'11943',  bulletin:'MS12-035',  kb:'KB2604115', platform:'Windows', status:'Not Approved', desc:'Security Update for .NET Framework 3.5.1 (KB2604115)', sev:'critical' },
+      { id:'98726',  bulletin:'MSWU-577',  kb:'KB2977765', platform:'Windows', status:'Not Approved', desc:'Update for .NET Framework 4.5 for Windows 8',          sev:'low'      },
+      { id:'98593',  bulletin:'MSWU-536',  kb:'KB2800088', platform:'Windows', status:'Not Approved', desc:'Update for Windows 8 (KB2800088)',                     sev:'low'      },
+      { id:'15979',  bulletin:'MS14-045',  kb:'KB2993651', platform:'Windows', status:'Not Approved', desc:'Security Update for Windows 8 (KB2993651)',            sev:'warning'  },
+      { id:'100501', bulletin:'MSWU-1106', kb:'KB3000853', platform:'Windows', status:'Not Approved', desc:'Update for Windows 8 (KB3000853)',                     sev:'low'      },
+      { id:'14051',  bulletin:'MS13-052',  kb:'KB2840628', platform:'Windows', status:'Approved',     desc:'Security Update for .NET Framework 4.5 (KB2840628)',   sev:'warning'  },
+    ];
+
+    let declinedPatches = [];
+
+    /* ===== TABS ===== */
+    function switchTab(el, panelId) {
+      document.querySelectorAll('.wizard-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      ['patches-panel','apps-panel','family-panel'].forEach(id => {
+        document.getElementById(id).style.display = id === panelId ? 'block' : 'none';
+      });
+    }
+
+    /* ===== FILTER CHEVRON TOGGLE ===== */
+    function toggleFilter(iconId) {
+      const icon = document.getElementById(iconId);
+      const rotated = icon.style.transform === 'rotate(180deg)';
+      icon.style.transform = rotated ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    /* ===== STEPPER ===== */
+    function setStep(n) {
+      const steps = document.querySelectorAll('.step-item');
+      steps.forEach((s, i) => {
+        s.classList.toggle('visited', i < n);
+      });
+    }
+
+    /* ===== ADD PATCHES MODAL ===== */
+    function openAddPatch() {
+      document.getElementById('addPatchOverlay').style.display = 'flex';
+      document.getElementById('addPatchSearch').value = '';
+      renderAddPatchList('');
+    }
+    function closeAddPatch() {
+      document.getElementById('addPatchOverlay').style.display = 'none';
+    }
+    document.getElementById('addPatchOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeAddPatch();
+    });
+
+    function renderAddPatchList(q) {
+      const filtered = ALL_PATCHES.filter(p =>
+        p.desc.toLowerCase().includes(q) ||
+        p.bulletin.toLowerCase().includes(q) ||
+        p.id.includes(q) ||
+        p.kb.toLowerCase().includes(q));
+      const sevColor = { critical:'#d32f2f', warning:'#f9a825', low:'#9e9e9e' };
+      document.getElementById('addPatchList').innerHTML = filtered.length
+        ? filtered.map(p => `
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #f5f5f5;font-size:13px;cursor:pointer;transition:background .1s"
+               onmouseover="this.style.background='#f8fafd'" onmouseout="this.style.background=''">
+            <input type="checkbox" class="add-patch-cb" data-id="${p.id}" style="accent-color:#1a73e8;width:14px;height:14px;cursor:pointer;flex-shrink:0" />
+            <span style="width:8px;height:8px;border-radius:50%;background:${sevColor[p.sev]};flex-shrink:0;display:inline-block"></span>
+            <span style="color:#1a73e8;font-size:12px;min-width:52px">${p.id}</span>
+            <span style="color:#888;font-size:12px;min-width:72px">${p.bulletin}</span>
+            <span style="flex:1;color:#333">${p.desc}</span>
+          </div>`)
+          .join('')
+        : '<div style="padding:20px;text-align:center;color:#999;font-size:13px">No patches found</div>';
+    }
+
+    function filterAddPatches() {
+      renderAddPatchList(document.getElementById('addPatchSearch').value.toLowerCase());
+    }
+
+    function confirmAddPatches() {
+      const selected = [...document.querySelectorAll('.add-patch-cb:checked')].map(cb => cb.dataset.id);
+      const newPatches = ALL_PATCHES.filter(p => selected.includes(p.id) && !declinedPatches.find(d => d.id === p.id));
+      declinedPatches = [...declinedPatches, ...newPatches];
+      renderPatchesTable();
+      closeAddPatch();
+    }
+
+    function renderPatchesTable() {
+      const tbody = document.getElementById('patchesTableBody');
+      if (!declinedPatches.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No Supported Patches found based on the specified criteria</td></tr>';
+        return;
+      }
+      const sevColor = { critical:'#d32f2f', warning:'#f9a825', low:'#9e9e9e' };
+      tbody.innerHTML = declinedPatches.map(p => `
+        <tr>
+          <td><input type="checkbox" style="accent-color:#1a73e8" /></td>
+          <td><span style="display:inline-flex;align-items:center;gap:5px">
+            <i class="fa fa-square" style="color:${sevColor[p.sev]};font-size:12px"></i>
+            <a href="#" style="color:#1a73e8">${p.id}</a>
+          </span></td>
+          <td><a href="#" style="color:#1a73e8">${p.bulletin}</a></td>
+          <td style="color:#555">${p.kb}</td>
+          <td style="color:#555">${p.platform}</td>
+          <td style="color:#555">${p.status}</td>
+          <td style="color:#555">${p.desc}</td>
+          <td>
+            <button onclick="removePatch('${p.id}')" title="Remove"
+              style="background:none;border:none;color:#d32f2f;cursor:pointer;font-size:13px;padding:4px 8px;border-radius:4px"
+              onmouseover="this.style.background='#fde8e8'" onmouseout="this.style.background='none'">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>`).join('');
+    }
+
+    function removePatch(id) {
+      declinedPatches = declinedPatches.filter(p => p.id !== id);
+      renderPatchesTable();
+    }
+
+    /* ===== SELECT ALL ===== */
+    document.getElementById('selectAllPatches').addEventListener('change', function() {
+      document.querySelectorAll('#patchesTableBody input[type=checkbox]').forEach(cb => cb.checked = this.checked);
+    });
+
+    /* ===== AUTO-DECLINE ===== */
+    function handleAutoDecline(cb) {
+      const threshold = document.getElementById('autoDeclineThreshold');
+      const subtext   = document.getElementById('autoDeclineSubtext');
+      threshold.disabled = !cb.checked;
+      threshold.style.opacity = cb.checked ? '1' : '.5';
+      threshold.style.cursor  = cb.checked ? 'pointer' : 'not-allowed';
+      if (cb.checked) {
+        updateAutoDeclineSubtext();
+        threshold.onchange = updateAutoDeclineSubtext;
+      } else {
+        subtext.style.color = '#777';
+        subtext.textContent = 'Patches which are manually approved will remain approved, even if their reliability score drops below the threshold.';
+      }
+    }
+    function updateAutoDeclineSubtext() {
+      const val = document.getElementById('autoDeclineThreshold').value;
+      const subtext = document.getElementById('autoDeclineSubtext');
+      subtext.style.color = '#1a73e8';
+      subtext.textContent = `Active — patches scoring below ${val} will be automatically declined, even if previously approved.`;
+    }
+
+    /* ===== NAV ===== */
+    function goNext() {
+      alert('Proceeding to Summary Details…');
+    }
+
+    /* ===== TOPBAR DROPDOWNS ===== */
+    document.getElementById('overflowBtn').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('overflowMenu').classList.toggle('open');
+      document.getElementById('userDropdown').classList.remove('open');
+    });
+    document.getElementById('userMenu').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('userDropdown').classList.toggle('open');
+      document.getElementById('overflowMenu').classList.remove('open');
+    });
+    document.addEventListener('click', () => {
+      document.getElementById('overflowMenu').classList.remove('open');
+      document.getElementById('userDropdown').classList.remove('open');
+    });
+  </script>
+</body>
+</html>

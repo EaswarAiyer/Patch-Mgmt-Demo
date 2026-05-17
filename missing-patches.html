@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Missing Patches — Endpoint Central</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* === RESET === */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:14px}
+    body{font-family:'Lato','Segoe UI',Roboto,Arial,sans-serif;background:#f5f6fa;color:#333;overflow:hidden;height:100vh}
+    a{text-decoration:none;color:inherit}
+    ul{list-style:none}
+    hr{border:none;border-top:1px solid #e4e4e4;margin:4px 0}
+    button{font-family:inherit;cursor:pointer}
+
+    /* === TOPBAR === */
+    .topbar{display:flex;align-items:center;height:48px;background:#222;color:#fff;padding:0 0 0 12px;position:fixed;top:0;left:0;right:0;z-index:1000}
+    .topbar-left{display:flex;align-items:center;gap:8px;padding-right:16px}
+    .brand{display:flex;align-items:center;gap:8px}
+    .brand-icon{font-size:24px;background:linear-gradient(135deg,#e53935,#f9a825,#43a047,#1e88e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .brand-text{font-size:15px;font-weight:600;white-space:nowrap;color:#fff}
+    .topbar-nav{display:flex;align-items:center;height:100%;flex:1;overflow:hidden}
+    .topnav-item{padding:0 14px;height:48px;display:flex;align-items:center;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;cursor:pointer}
+    .topnav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .topnav-item.active{color:#fff;border-bottom-color:#4d90fe;background:rgba(77,144,254,.15)}
+    .topnav-overflow{position:relative;height:48px;display:flex;align-items:center}
+    .overflow-dots{padding:0 14px;height:48px;display:flex;align-items:center;font-size:18px;letter-spacing:2px;color:rgba(255,255,255,.7);cursor:pointer;font-weight:bold}
+    .overflow-dots:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .overflow-menu{display:none;position:absolute;top:48px;left:0;background:#fff;color:#333;border-radius:0 0 8px 8px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:200px;z-index:1100;overflow:hidden}
+    .overflow-menu.open{display:block}
+    .overflow-menu a{display:block;padding:10px 20px;font-size:13px;color:#333;transition:background .1s}
+    .overflow-menu a:hover{background:#f0f4ff;color:#1a73e8}
+    .topbar-right{display:flex;align-items:center;gap:2px;margin-left:auto;padding-right:8px;flex-shrink:0}
+    .trial-btn{background:#4d90fe;color:#fff;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap;margin-right:4px}
+    .trial-btn:hover{background:#3b7ddb}
+    .jump-sdp{display:flex;align-items:center;gap:4px;padding:6px 10px;font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap}
+    .jump-sdp:hover{color:#fff}
+    .topbar-action{padding:8px 10px;cursor:pointer;border-radius:4px;font-size:16px;position:relative;color:rgba(255,255,255,.7);transition:background .15s}
+    .topbar-action:hover{background:rgba(255,255,255,.1);color:#fff}
+    .user-avatar{font-size:22px}
+    .user-dropdown{display:none;position:absolute;top:44px;right:0;background:#fff;color:#333;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:180px;z-index:1100;overflow:hidden}
+    .user-dropdown.open{display:block}
+    .user-dropdown a{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;transition:background .1s;color:#333}
+    .user-dropdown a:hover{background:#f5f7fa}
+
+    /* === LAYOUT === */
+    .main-wrapper{display:flex;margin-top:48px;height:calc(100vh - 48px)}
+
+    /* === SIDEBAR === */
+    .sidebar{width:240px;min-width:240px;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;overflow-y:auto;transition:width .2s,min-width .2s;position:relative}
+    .sidebar.collapsed{width:0;min-width:0;overflow:hidden;border:none}
+    .sidebar-nav{flex:1;padding:8px 0}
+    .sidebar-top-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:#555;cursor:pointer;transition:background .1s;white-space:nowrap}
+    .sidebar-top-item:hover{background:#f0f4ff;color:#1a73e8}
+    .sidebar-top-item i{width:16px;text-align:center;font-size:14px;color:#888}
+    .sidebar-group-header{display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:13px;font-weight:600;color:#333;cursor:pointer;transition:background .1s;user-select:none}
+    .sidebar-group-header:hover{background:#f5f5f5}
+    .sidebar-group-header i.group-icon{width:16px;text-align:center;font-size:14px;color:#888}
+    .sidebar-group-header .arrow{margin-left:auto;font-size:11px;color:#aaa;transition:transform .2s}
+    .sidebar-group-items{display:block}
+    .sidebar-group-items.collapsed-items{display:none}
+    .sidebar-group-items li{position:relative}
+    .sidebar-group-items li a{display:flex;align-items:center;justify-content:space-between;padding:9px 20px 9px 36px;font-size:13px;color:#555;cursor:pointer;transition:all .1s;border-left:3px solid transparent}
+    .sidebar-group-items li a:hover{background:#f0f4ff;color:#1a73e8}
+    .sidebar-group-items li a.active{background:#e8f0fe;color:#1a73e8;border-left-color:#1a73e8;font-weight:500}
+    .nav-badge{display:inline-flex;align-items:center;justify-content:center;background:#e53935;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;min-width:20px;flex-shrink:0}
+    .sidebar-group-items .nav-badge{background:#757575}
+    .sidebar-section-label{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px;padding:10px 20px 4px;margin-top:4px}
+    .sidebar-collapse-btn{position:absolute;top:50%;right:-12px;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:#fff;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:10px;color:#888;cursor:pointer;z-index:10;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    .sidebar-collapse-btn:hover{background:#f5f5f5}
+
+    /* === CONTENT === */
+    .content{flex:1;overflow-y:auto;background:#f5f6fa}
+
+    /* === ALERT BANNER === */
+    .alert-banner{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:10px 28px;font-size:13px;background:#fff3e0;color:#e65100;border-bottom:1px solid #ffe0b2}
+    .alert-banner.info{background:#e8f0fe;color:#1a73e8;border-color:#c8dafe}
+    .alert-banner a{color:#1a73e8;font-weight:500}
+    .alert-banner a:hover{text-decoration:underline}
+    .alert-banner .pipe{color:#a0b4dc;margin:0 4px}
+
+    /* === TOOLBAR === */
+    .toolbar{display:flex;align-items:center;gap:8px;padding:12px 28px;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e8e8e8}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:13px;font-weight:500;border:1px solid #dadce0;border-radius:4px;background:#fff;color:#333;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .btn i{display:inline-block;line-height:1}
+    .btn:hover{background:#f8f9fa;border-color:#ccc}
+    .btn-primary{background:#1a73e8;color:#fff;border-color:#1a73e8}
+    .btn-primary:hover{background:#1557b0}
+    .btn-dropdown-wrap{position:relative;display:inline-block}
+    .btn-dropdown-menu{display:none;position:absolute;top:100%;left:0;background:#fff;border-radius:0 0 6px 6px;box-shadow:0 6px 20px rgba(0,0,0,.15);min-width:180px;z-index:200;overflow:hidden;margin-top:2px;border:1px solid #e0e0e0}
+    .btn-dropdown-wrap.open .btn-dropdown-menu{display:block}
+    .btn-dropdown-menu a{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;color:#333;transition:background .1s}
+    .btn-dropdown-menu a:hover{background:#f0f4ff;color:#1a73e8}
+    .btn-dropdown-menu a i{font-size:14px;width:16px;text-align:center;color:#555}
+    .toolbar-right{margin-left:auto;display:flex;align-items:center;gap:4px}
+    .total-records-label{font-size:13px;color:#1a73e8;font-weight:500;margin-right:6px;white-space:nowrap}
+    .icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:#555;font-size:13px}
+    .icon-btn:hover{background:#f0f0f0}
+
+    /* === DATA TABLE === */
+    .table-wrap{overflow-x:auto;background:#fff}
+    table.data-table{width:100%;border-collapse:collapse;min-width:900px}
+    table.data-table th{background:#f8f9fa;font-weight:600;font-size:12px;color:#5f6368;padding:10px 16px;text-align:left;border-bottom:1px solid #e8e8e8;white-space:nowrap;position:sticky;top:0}
+    table.data-table th .sort-icon{margin-left:4px;font-size:11px;color:#888;cursor:pointer}
+    table.data-table th.sortable{cursor:pointer}
+    table.data-table th.sortable:hover{background:#eef0f3}
+    table.data-table td{padding:11px 16px;font-size:13px;border-bottom:1px solid #f0f0f0;color:#333;vertical-align:middle}
+    table.data-table tbody tr:hover{background:#f8fafd}
+    table.data-table td a{color:#1a73e8}
+    table.data-table td a:hover{text-decoration:underline}
+    table.data-table th:first-child,table.data-table td:first-child{width:36px;text-align:center;padding-left:12px;padding-right:4px}
+    .patch-id-cell{display:flex;align-items:center;gap:6px}
+    .patch-icon{font-size:13px}
+    .patch-icon.critical{color:#d32f2f}
+    .patch-icon.warning{color:#f9a825}
+    .patch-icon.low{color:#9e9e9e}
+    .status-approved{display:inline-flex;align-items:center;gap:5px;color:#2e7d32;font-size:13px}
+    .status-approved-warn{display:inline-flex;align-items:center;gap:5px;color:#c62828;font-size:13px}
+    .platform-cell{display:flex;align-items:center;gap:6px}
+    .table-pagination{display:flex;align-items:center;justify-content:flex-end;padding:10px 16px;font-size:12px;color:#666;border-top:1px solid #f0f0f0;background:#fff;gap:8px}
+    .table-pagination select{padding:2px 6px;border:1px solid #ddd;border-radius:3px;font-size:12px}
+    .page-btn{padding:4px 8px;cursor:pointer;color:#1a73e8}
+    .page-btn:hover{text-decoration:underline}
+
+    /* === RELIABILITY SCORE === */
+    .score-cell{position:relative;display:inline-flex;align-items:center;gap:6px}
+    .score-badge{display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px;min-width:44px}
+    .score-green{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+    .score-yellow{background:#fff8e1;color:#b45309;border:1px solid #ffe082}
+    .score-red{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
+    .score-tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#333;color:#fff;font-size:12px;font-weight:400;padding:8px 12px;border-radius:6px;width:260px;line-height:1.5;z-index:500;box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none}
+    .score-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#333}
+    .score-cell:hover .score-tip{display:block}
+
+    /* === SCROLLBAR === */
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#c0c7d0;border-radius:3px}
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <span class="brand-icon"><i class="fa-solid fa-circle-notch"></i></span>
+        <span class="brand-text">Endpoint Central</span>
+      </div>
+    </div>
+    <nav class="topbar-nav" id="topNav">
+      <a href="#" class="topnav-item">Home</a>
+      <a href="#" class="topnav-item">Configurations</a>
+      <a href="#" class="topnav-item active">Threats &amp; Patches</a>
+      <a href="#" class="topnav-item">Software Deployment</a>
+      <a href="#" class="topnav-item">Inventory</a>
+      <a href="#" class="topnav-item">OS Deployment</a>
+      <a href="#" class="topnav-item">MDM</a>
+      <a href="#" class="topnav-item">Tools</a>
+      <a href="#" class="topnav-item">Agent</a>
+      <a href="#" class="topnav-item">Admin</a>
+      <div class="topnav-overflow" id="overflowBtn">
+        <span class="overflow-dots">•••</span>
+        <div class="overflow-menu" id="overflowMenu">
+          <a href="#">Browsers</a>
+          <a href="#">Application Control</a>
+        </div>
+      </div>
+    </nav>
+    <div class="topbar-right">
+      <a href="#" class="trial-btn">Start your 30 days free trial</a>
+      <a href="#" class="jump-sdp"><i class="fa fa-building"></i> Jump to SDP</a>
+      <div class="topbar-action" title="Search"><i class="fa fa-search"></i></div>
+      <div class="topbar-action" title="Notifications"><i class="fa fa-bell"></i></div>
+      <div class="topbar-action" title="What's New"><i class="fa fa-bolt"></i></div>
+      <div class="topbar-action user-avatar" id="userMenu" style="position:relative">
+        <i class="fa fa-user-circle"></i>
+        <div class="user-dropdown" id="userDropdown">
+          <a href="#"><i class="fa fa-user"></i> My Profile</a>
+          <a href="#"><i class="fa fa-key"></i> Change Password</a>
+          <hr />
+          <a href="#"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+      <div class="topbar-action" title="Apps"><i class="fa fa-th"></i></div>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+
+        <!-- Top-level icon items -->
+        <div class="sidebar-top-item">
+          <i class="fa fa-house group-icon"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="sidebar-top-item">
+          <i class="fa fa-shield-halved group-icon"></i>
+          <span>Threats</span>
+        </div>
+
+        <!-- Patches group (expanded) -->
+        <div class="sidebar-group" id="patchesGroup">
+          <div class="sidebar-group-header" onclick="toggleGroup('patchesGroup')">
+            <i class="fa fa-shield-virus group-icon"></i>
+            <span>Patches</span>
+            <i class="fa fa-chevron-down arrow" id="patchesArrow"></i>
+          </div>
+          <ul class="sidebar-group-items" id="patchesItems">
+            <li><a href="#" class="active"><span>Missing Patches</span><span class="nav-badge">316</span></a></li>
+            <li><a href="#"><span>Installed Patches</span><span class="nav-badge">81</span></a></li>
+            <li><a href="#"><span>Applicable Patches</span><span class="nav-badge">397</span></a></li>
+            <li><a href="#"><span>Top-Priority Patches</span></a></li>
+            <li><a href="#"><span>Supported Patches</span><span class="nav-badge">554388</span></a></li>
+            <li><a href="#"><span>Latest Patches</span><span class="nav-badge">78203</span></a></li>
+            <li><a href="#"><span>Detailed View</span></a></li>
+            <li><a href="#"><span>Downloaded Patches</span></a></li>
+            <li><a href="decline-patch.html"><span>Decline Patch</span></a></li>
+          </ul>
+        </div>
+
+        <!-- Deployment (collapsed) -->
+        <div class="sidebar-group" id="deployGroup">
+          <div class="sidebar-group-header" onclick="toggleGroup('deployGroup')">
+            <i class="fa fa-rocket group-icon"></i>
+            <span>Deployment</span>
+            <i class="fa fa-chevron-right arrow" id="deployGroupArrow"></i>
+          </div>
+          <ul class="sidebar-group-items collapsed-items" id="deployGroupItems">
+            <li><a href="patch-approval-settings.html"><span>Patch Approval Settings</span></a></li>
+          </ul>
+        </div>
+
+        <!-- Attention Required (collapsed) -->
+        <div class="sidebar-group" id="attentionGroup">
+          <div class="sidebar-group-header" onclick="toggleGroup('attentionGroup')">
+            <i class="fa fa-triangle-exclamation group-icon"></i>
+            <span>Attention Required</span>
+            <i class="fa fa-chevron-right arrow" id="attentionArrow"></i>
+          </div>
+          <ul class="sidebar-group-items collapsed-items" id="attentionItems">
+            <li><a href="#"><span>Upload Pending</span><span class="nav-badge">1</span></a></li>
+          </ul>
+        </div>
+
+      </nav>
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn">
+        <i class="fa fa-angle-double-left" id="collapseIcon"></i>
+      </button>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Info banner -->
+      <div class="alert-banner info">
+        <i class="fa fa-info-circle"></i>
+        <span>This view displays the list of patches that are found missing in your network.</span>
+        <span class="pipe">|</span>
+        <a href="#"><i class="fa fa-play-circle"></i> Watch Demo</a>
+        <span class="pipe">|</span>
+        <a href="#">Do you want more pre-defined patch reports? Tell us your requirements.</a>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <button class="btn btn-primary">
+          <i class="fa fa-cloud-arrow-up"></i> Install/Publish Patches
+        </button>
+        <button class="btn">
+          <i class="fa fa-download"></i> Download Patches
+        </button>
+        <div class="btn-dropdown-wrap" id="markAsWrap">
+          <button class="btn" onclick="toggleDropdown('markAsWrap')">
+            <i class="fa fa-check"></i> Mark as <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="btn-dropdown-menu">
+            <a href="#"><i class="fa fa-circle-check"></i> Approve</a>
+            <a href="#"><i class="fa fa-circle-minus"></i> Not Approved</a>
+            <a href="#"><i class="fa fa-ban"></i> Decline</a>
+          </div>
+        </div>
+        <div class="btn-dropdown-wrap" id="filtersWrap">
+          <button class="btn" onclick="toggleDropdown('filtersWrap')">
+            <i class="fa fa-filter"></i> Filters <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="btn-dropdown-menu">
+            <a href="#"><i class="fa fa-desktop"></i> Platform</a>
+            <a href="#"><i class="fa fa-flag"></i> Approve Status</a>
+            <a href="#"><i class="fa fa-rotate"></i> Reboot</a>
+            <a href="#"><i class="fa fa-triangle-exclamation"></i> Severity</a>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <span class="total-records-label">Total Records |</span>
+          <div class="icon-btn" title="Search"><i class="fa fa-search"></i></div>
+          <div class="icon-btn" title="Copy"><i class="fa fa-copy"></i></div>
+          <div class="icon-btn" title="Export"><i class="fa fa-file-export"></i></div>
+        </div>
+      </div>
+
+      <!-- Data table -->
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll" /></th>
+              <th>Patch ID</th>
+              <th>Bulletin ID</th>
+              <th>Patch Description</th>
+              <th class="sortable" id="sortMissingTh">
+                Missing Systems <i class="fa fa-sort-down sort-icon" id="sortIcon"></i>
+              </th>
+              <th>Approve Status</th>
+              <th>Platform</th>
+              <th>Reboot</th>
+              <th>Failed Systems</th>
+              <th>Reliability Score</th>
+            </tr>
+          </thead>
+          <tbody id="patchTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="table-pagination">
+        <span>1 – 13 of <a href="#">Total Records</a></span>
+        <select title="Rows per page">
+          <option>25</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+        <span class="page-btn">&#8249;</span>
+        <span class="page-btn">&#8250;</span>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    /* ===== DATA ===== */
+    const PATCH_DATA = [
+      { id:'17268',  bulletin:'MS15-028',  sev:'warning',  desc:'Security Update for Windows 8 (KB3030377)',                              missing:10, status:'approved',      reboot:'May Require', failed:0, score:8.2, reason:'' },
+      { id:'98726',  bulletin:'MSWU-577',  sev:'low',      desc:'Update for .NET Framework 4.5 for Windows 8, Windo...',                  missing:10, status:'approved',      reboot:'May Require', failed:0, score:6.4, reason:'Moderate compatibility issues reported with mixed .NET runtime environments on some managed endpoints.' },
+      { id:'98593',  bulletin:'MSWU-536',  sev:'low',      desc:'Update for Windows 8 (KB2800088)',                                       missing:10, status:'approved',      reboot:'May Require', failed:0, score:7.9, reason:'' },
+      { id:'17436',  bulletin:'MS15-038',  sev:'warning',  desc:'Security Update for Windows 8 (KB3045685)',                              missing:10, status:'approved',      reboot:'May Require', failed:0, score:9.0, reason:'' },
+      { id:'98398',  bulletin:'MSWU-465',  sev:'low',      desc:'Update for Windows 8 (KB2784160)',                                       missing:10, status:'approved',      reboot:'May Require', failed:0, score:4.3, reason:'Known conflicts with several third-party antivirus products; elevated installation failure rate observed across test machines.' },
+      { id:'14051',  bulletin:'MS13-052',  sev:'warning',  desc:'Security Update for Microsoft .NET Framework 4.5 on ...',                missing:10, status:'approved',      reboot:'May Require', failed:0, score:6.8, reason:'Patch age exceeds 30 months with limited validation data on current hardware configurations.' },
+      { id:'100501', bulletin:'MSWU-1106', sev:'low',      desc:'Update for Windows 8 (KB3000853)',                                       missing:10, status:'approved',      reboot:'May Require', failed:0, score:8.5, reason:'' },
+      { id:'100288', bulletin:'MSWU-1037', sev:'low',      desc:'Update for Windows 8 (KB2977174)',                                       missing:10, status:'approved',      reboot:'May Require', failed:0, score:5.1, reason:'Superseded by a newer rollup; partial compatibility issues noted on Windows 8.1 systems.' },
+      { id:'15979',  bulletin:'MS14-045',  sev:'warning',  desc:'Security Update for Windows 8 (KB2993651)',                              missing:10, status:'approved',      reboot:'May Require', failed:0, score:3.7, reason:'High post-install reboot failure rate; known incompatibility with Hyper-V guest environments detected during QA.' },
+      { id:'99975',  bulletin:'MSWU-950',  sev:'low',      desc:'Update for Windows 8 (KB2967916)',                                       missing:10, status:'approved',      reboot:'May Require', failed:0, score:7.2, reason:'Superseded update with reduced applicability; lower priority in current patching cycles.' },
+      { id:'8584',   bulletin:'MS10-033',  sev:'critical', desc:'Security Update for Windows 7 (KB979482)',                               missing:10, status:'approved-warn', reboot:'May Require', failed:0, score:2.4, reason:'Targets a deprecated OS (Windows 7, EOL). No vendor support available; high risk of post-patch instability on remaining machines.' },
+      { id:'16841',  bulletin:'MS15-006',  sev:'warning',  desc:'Security Update for Windows 8 (KB3004365)',                              missing:10, status:'approved',      reboot:'May Require', failed:0, score:8.9, reason:'' },
+      { id:'11943',  bulletin:'MS12-035',  sev:'critical', desc:'Security Update for Microsoft .NET Framework 3.5.1 o...',                missing:10, status:'approved-warn', reboot:'May Require', failed:0, score:3.1, reason:'Legacy framework patch with a known regression on KB2840628; conflicts with newer .NET runtime versions in production.' },
+    ];
+
+    /* ===== RENDER ROWS ===== */
+    function renderRows(data) {
+      const tbody = document.getElementById('patchTableBody');
+      tbody.innerHTML = data.map(row => {
+        const iconClass = row.sev === 'critical' ? 'critical' : row.sev === 'warning' ? 'warning' : 'low';
+        const statusHtml = row.status === 'approved-warn'
+          ? `<span class="status-approved-warn"><i class="fa fa-flag"></i> Approved</span>`
+          : `<span class="status-approved"><i class="fa fa-flag"></i> Approved</span>`;
+        return `
+          <tr>
+            <td><input type="checkbox" class="row-cb" /></td>
+            <td>
+              <div class="patch-id-cell">
+                <i class="fa fa-square patch-icon ${iconClass}"></i>
+                <a href="#">${row.id}</a>
+              </div>
+            </td>
+            <td><a href="#">${row.bulletin}</a></td>
+            <td>${row.desc}</td>
+            <td><a href="#">${row.missing}</a></td>
+            <td>${statusHtml}</td>
+            <td>
+              <div class="platform-cell">
+                <i class="fa-brands fa-windows" style="color:#0078d4;font-size:15px"></i>
+                <span>Windows</span>
+              </div>
+            </td>
+            <td>${row.reboot}</td>
+            <td>${row.failed}</td>
+            <td>
+              <div class="score-cell">
+                <span class="score-badge ${row.score > 7.5 ? 'score-green' : row.score >= 5 ? 'score-yellow' : 'score-red'}">${row.score.toFixed(1)}</span>
+                ${row.reason ? `<span class="score-tip">${row.reason}</span>` : ''}
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+      attachRowCheckboxListeners();
+    }
+
+    /* ===== SELECT ALL ===== */
+    document.getElementById('selectAll').addEventListener('change', function () {
+      document.querySelectorAll('.row-cb').forEach(cb => { cb.checked = this.checked; });
+    });
+
+    function attachRowCheckboxListeners() {
+      document.querySelectorAll('.row-cb').forEach(cb => {
+        cb.addEventListener('change', syncSelectAll);
+      });
+    }
+
+    function syncSelectAll() {
+      const all = document.querySelectorAll('.row-cb');
+      const checked = document.querySelectorAll('.row-cb:checked');
+      const hdr = document.getElementById('selectAll');
+      hdr.indeterminate = checked.length > 0 && checked.length < all.length;
+      hdr.checked = all.length > 0 && checked.length === all.length;
+    }
+
+    /* ===== SORT ===== */
+    let sortAsc = false;
+    document.getElementById('sortMissingTh').addEventListener('click', function () {
+      sortAsc = !sortAsc;
+      const icon = document.getElementById('sortIcon');
+      icon.className = sortAsc ? 'fa fa-sort-up sort-icon' : 'fa fa-sort-down sort-icon';
+      const sorted = [...PATCH_DATA].sort((a, b) => sortAsc ? a.missing - b.missing : b.missing - a.missing);
+      renderRows(sorted);
+    });
+
+    /* ===== SIDEBAR COLLAPSE ===== */
+    let sidebarCollapsed = false;
+    document.getElementById('sidebarCollapseBtn').addEventListener('click', function () {
+      sidebarCollapsed = !sidebarCollapsed;
+      document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+      document.getElementById('collapseIcon').className = sidebarCollapsed
+        ? 'fa fa-angle-double-right'
+        : 'fa fa-angle-double-left';
+    });
+
+    /* ===== SIDEBAR GROUPS ===== */
+    function toggleGroup(groupId) {
+      const items = document.getElementById(groupId.replace('Group', 'Items'));
+      const arrow = document.getElementById(groupId.replace('Group', 'Arrow'));
+      const isOpen = !items.classList.contains('collapsed-items');
+      items.classList.toggle('collapsed-items', isOpen);
+      if (isOpen) {
+        arrow.className = arrow.className.replace('fa-chevron-down', 'fa-chevron-right');
+      } else {
+        arrow.className = arrow.className.replace('fa-chevron-right', 'fa-chevron-down');
+      }
+    }
+
+    /* ===== DROPDOWN MENUS ===== */
+    function toggleDropdown(wrapId) {
+      const wrap = document.getElementById(wrapId);
+      const wasOpen = wrap.classList.contains('open');
+      closeAllDropdowns();
+      if (!wasOpen) wrap.classList.add('open');
+    }
+
+    function closeAllDropdowns() {
+      document.querySelectorAll('.btn-dropdown-wrap.open').forEach(el => el.classList.remove('open'));
+      document.getElementById('overflowMenu').classList.remove('open');
+      document.getElementById('userDropdown').classList.remove('open');
+    }
+
+    document.getElementById('overflowBtn').addEventListener('click', function (e) {
+      e.stopPropagation();
+      const menu = document.getElementById('overflowMenu');
+      const wasOpen = menu.classList.contains('open');
+      closeAllDropdowns();
+      if (!wasOpen) menu.classList.add('open');
+    });
+
+    document.getElementById('userMenu').addEventListener('click', function (e) {
+      e.stopPropagation();
+      const dd = document.getElementById('userDropdown');
+      const wasOpen = dd.classList.contains('open');
+      closeAllDropdowns();
+      if (!wasOpen) dd.classList.add('open');
+    });
+
+    document.addEventListener('click', closeAllDropdowns);
+
+    /* ===== INIT ===== */
+    renderRows(PATCH_DATA);
+  </script>
+</body>
+</html>
