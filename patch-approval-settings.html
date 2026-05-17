@@ -350,28 +350,6 @@
               <i class="fa fa-plus"></i> Add Rule
             </button>
 
-            <!-- Auto-decline block -->
-            <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px">
-              <label class="toggle-switch" style="margin-top:2px;flex-shrink:0" title="Auto-decline patches when reliability score drops below threshold">
-                <input type="checkbox" id="toggleAutoDecline" onchange="handleAutoDecline(this)" />
-                <div class="toggle-track"></div>
-                <div class="toggle-thumb"></div>
-              </label>
-              <div style="flex:1">
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                  <span style="font-size:13px;font-weight:500;color:#333">Auto-decline patches if reliability score drops below</span>
-                  <select id="autoDeclineThreshold" disabled
-                    style="border:1px solid #dadce0;border-radius:4px;padding:3px 8px;font-size:13px;background:#fff;color:#333;cursor:not-allowed;opacity:.5">
-                    <option>3</option><option>4</option><option selected>5</option>
-                    <option>6</option><option>7</option><option>8</option>
-                  </select>
-                </div>
-                <div id="autoDeclineSubtext" style="font-size:12px;color:#777;margin-top:4px;line-height:1.5">
-                  Applies to all approved patches, regardless of approval method.
-                </div>
-              </div>
-            </div>
-
             <div class="rules-grid">
 
               <!-- Rule card 1 -->
@@ -724,28 +702,6 @@
     function selectAll(selector, e) {
       e.preventDefault();
       document.querySelectorAll(selector).forEach(cb => cb.checked = true);
-    }
-
-    /* ===== AUTO-DECLINE TOGGLE ===== */
-    function handleAutoDecline(cb) {
-      const threshold = document.getElementById('autoDeclineThreshold');
-      const subtext   = document.getElementById('autoDeclineSubtext');
-      threshold.disabled = !cb.checked;
-      threshold.style.opacity  = cb.checked ? '1'   : '.5';
-      threshold.style.cursor   = cb.checked ? 'pointer' : 'not-allowed';
-      if (cb.checked) {
-        updateAutoDeclineSubtext();
-        threshold.addEventListener('change', updateAutoDeclineSubtext);
-      } else {
-        subtext.style.color = '#777';
-        subtext.textContent = 'Applies to all approved patches, regardless of approval method.';
-      }
-    }
-    function updateAutoDeclineSubtext() {
-      const val     = document.getElementById('autoDeclineThreshold').value;
-      const subtext = document.getElementById('autoDeclineSubtext');
-      subtext.style.color   = '#1a73e8';
-      subtext.textContent   = `Active — patches scoring below ${val} will be automatically declined, even if previously approved.`;
     }
 
     /* ===== CREATE RULE ===== */
