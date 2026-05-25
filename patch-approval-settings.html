@@ -419,24 +419,8 @@
           </div>
         </div>
 
-        <!-- Row 2: Approve without testing -->
-        <div class="approval-row">
-          <div class="approval-icon shield">
-            <i class="fa fa-shield"></i>
-          </div>
-          <div class="approval-info">
-            <div class="approval-title">Approve without testing</div>
-            <div class="approval-desc">Automatically approve and deploy patches without any testing</div>
-          </div>
-          <label class="toggle-switch" title="Toggle approve without testing">
-            <input type="checkbox" id="toggleNoTest" onchange="handleExclusiveToggle('toggleNoTest')" />
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-
-        <!-- Row 3: Manual Testing -->
-        <div class="approval-row" style="flex-wrap:wrap;gap:0;padding:0;border-bottom:none">
+        <!-- Row 2: Manual Testing -->
+        <div class="approval-row" style="flex-wrap:wrap;gap:0;padding:0">
           <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;width:100%">
             <div class="approval-icon manual">
               <i class="fa fa-user-gear"></i>
@@ -474,6 +458,22 @@
             <button class="btn-save">Save changes</button>
             <button class="btn-cancel" onclick="cancelManual()">Cancel</button>
           </div>
+        </div>
+
+        <!-- Row 3: Approve without testing -->
+        <div class="approval-row" style="border-bottom:none">
+          <div class="approval-icon shield">
+            <i class="fa fa-shield"></i>
+          </div>
+          <div class="approval-info">
+            <div class="approval-title">Approve without testing</div>
+            <div class="approval-desc">Automatically approve and deploy patches without any testing</div>
+          </div>
+          <label class="toggle-switch" title="Toggle approve without testing">
+            <input type="checkbox" id="toggleNoTest" onchange="handleExclusiveToggle('toggleNoTest')" />
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
         </div>
 
       </div>
