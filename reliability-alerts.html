@@ -102,13 +102,15 @@
     .toolbar{display:flex;align-items:center;gap:8px;padding:10px 28px;background:#fff;border-bottom:1px solid #e8e8e8}
     .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:13px;font-weight:500;border:1px solid #dadce0;border-radius:4px;background:#fff;color:#333;cursor:pointer;transition:all .15s;white-space:nowrap}
     .btn:hover{background:#f8f9fa;border-color:#ccc}
-    .toolbar-right{margin-left:auto;display:flex;align-items:center;gap:4px}
+    .toolbar-right{margin-left:0;display:flex;align-items:center;gap:4px}
     .icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:#555;font-size:13px}
     .icon-btn:hover{background:#f0f0f0}
+    .toolbar-sep{width:1px;height:20px;background:#e0e0e0;margin:0 4px}
+    .notif-active{color:#1a73e8 !important;border-color:#1a73e8 !important;background:#e8f0fe !important}
 
     /* === TABLE === */
     .table-wrap{overflow-x:auto;background:#fff}
-    table.data-table{width:100%;border-collapse:collapse;min-width:860px}
+    table.data-table{width:100%;border-collapse:collapse;min-width:760px}
     table.data-table th{background:#f8f9fa;font-weight:600;font-size:12px;color:#5f6368;padding:10px 16px;text-align:left;border-bottom:1px solid #e8e8e8;white-space:nowrap;position:sticky;top:0}
     table.data-table td{padding:11px 16px;font-size:13px;border-bottom:1px solid #f0f0f0;color:#333;vertical-align:middle}
     table.data-table tbody tr{cursor:pointer}
@@ -166,26 +168,19 @@
     .sev-badge.critical{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
     .sev-badge.warning{background:#fff8e1;color:#b45309;border:1px solid #ffe082}
     .sev-badge.low{background:#f5f5f5;color:#555;border:1px solid #ddd}
-
     .panel-body{padding:20px 18px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:16px}
     .panel-score-row{display:flex;align-items:center;gap:12px}
     .panel-score-big{font-size:18px;padding:6px 18px;min-width:64px}
     .panel-score-label{font-size:13px;color:#777}
-
     .panel-reason-box{background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:12px 14px;font-size:13px;color:#5d4037;line-height:1.6}
     .panel-reason-box .reason-title{font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px;color:#b45309;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
-
     .panel-trend-box{background:#fff3f3;border:1px solid #ffcdd2;border-radius:7px;padding:10px 14px;font-size:13px;color:#555;display:flex;align-items:center;gap:8px}
     .panel-trend-box i{color:#d32f2f;font-size:14px}
-
     .panel-info-row{display:flex;align-items:center;gap:8px;font-size:13px;color:#555}
     .panel-info-row i{color:#888;width:16px;text-align:center}
-
     .panel-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#999;margin-bottom:-6px}
-
     .panel-status-select{width:100%;padding:8px 12px;border:1px solid #dadce0;border-radius:5px;font-size:13px;color:#333;background:#fff;outline:none;cursor:pointer}
     .panel-status-select:focus{border-color:#1a73e8}
-
     .panel-actions-col{display:flex;flex-direction:column;gap:8px}
     .panel-action-btn{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:13px;font-weight:500;border-radius:5px;cursor:pointer;transition:all .15s;border:1px solid #dadce0;background:#fff;color:#333;width:100%}
     .panel-action-btn:hover{background:#f8f9fa}
@@ -196,6 +191,58 @@
     .panel-action-btn.btn-muted{color:#777;border-color:#ddd}
     .panel-action-btn.btn-muted:hover{background:#f5f5f5}
     .panel-divider{border:none;border-top:1px solid #f0f0f0}
+
+    /* === TOGGLE SWITCH (copied from patch-approval-settings.html) === */
+    .toggle-switch{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+    .toggle-track{position:absolute;inset:0;border-radius:11px;background:#ccc;transition:background .2s;cursor:pointer}
+    .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s;pointer-events:none}
+    .toggle-switch input:checked ~ .toggle-track{background:#1a73e8}
+    .toggle-switch input:checked ~ .toggle-thumb{transform:translateX(18px)}
+
+    /* === MODAL OVERLAY === */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal-card{background:#fff;border-radius:12px;width:580px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.28)}
+    .modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 24px 16px;border-bottom:1px solid #e8e8e8;flex-shrink:0}
+    .modal-header-left{display:flex;align-items:center;gap:12px}
+    .modal-icon-wrap{width:40px;height:40px;border-radius:10px;background:#e8f0fe;color:#1a73e8;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .modal-title{font-size:15px;font-weight:700;color:#222;margin-bottom:2px}
+    .modal-subtitle{font-size:12.5px;color:#777}
+    .modal-close-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#555;border-radius:4px;font-size:16px;flex-shrink:0}
+    .modal-close-btn:hover{background:#f0f0f0;color:#333}
+    .modal-body{padding:0;overflow-y:auto;flex:1}
+    .modal-row{display:flex;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid #f0f0f0}
+    .modal-row:last-child{border-bottom:none}
+    .modal-row-col{flex-direction:column;align-items:flex-start}
+    .modal-row-info{flex:1}
+    .modal-row-label{font-size:13.5px;font-weight:600;color:#333;margin-bottom:3px}
+    .modal-row-desc{font-size:12.5px;color:#777}
+
+    /* === EMAIL CHIPS === */
+    .email-chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+    .email-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 12px;background:#e8f0fe;color:#1a73e8;border:1px solid #c5d8fb;border-radius:16px;font-size:12.5px;font-weight:500}
+    .email-chip-remove{width:16px;height:16px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:#1a73e8;cursor:pointer;border-radius:50%;font-size:11px;line-height:1;padding:0}
+    .email-chip-remove:hover{background:#c5d8fb}
+    .email-add-row{display:flex;gap:8px;width:100%}
+    .email-input{flex:1;padding:8px 12px;border:1px solid #dadce0;border-radius:5px;font-size:13px;color:#333;outline:none;font-family:inherit}
+    .email-input:focus{border-color:#1a73e8}
+    .email-input.input-error{border-color:#d32f2f}
+    .email-add-btn{background:#1a73e8;color:#fff;border-color:#1a73e8;white-space:nowrap}
+    .email-add-btn:hover{background:#1557b0;border-color:#1557b0}
+    .email-error{font-size:12px;color:#d32f2f;margin-top:5px;min-height:16px}
+
+
+    /* === MODAL FOOTER === */
+    .modal-footer{display:flex;align-items:center;gap:10px;padding:16px 24px;border-top:1px solid #f0f0f0;flex-shrink:0}
+    .btn-save{padding:8px 22px;background:#1a73e8;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;font-family:inherit}
+    .btn-save:hover{background:#1557b0}
+    .btn-cancel{padding:8px 18px;background:#fff;color:#333;border:1px solid #dadce0;border-radius:4px;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit}
+    .btn-cancel:hover{background:#f5f5f5}
+
+    /* === DISABLED NOTIF SETTINGS BODY === */
+    #notifSettingsBody{transition:opacity .2s}
+    #notifSettingsBody.notif-disabled{opacity:.4;pointer-events:none}
 
     /* === SCROLLBAR === */
     ::-webkit-scrollbar{width:6px;height:6px}
@@ -295,7 +342,7 @@
           </ul>
         </div>
 
-        <!-- Attention Required (EXPANDED — this is the active section) -->
+        <!-- Attention Required (EXPANDED) -->
         <div class="sidebar-group" id="attentionGroup">
           <div class="sidebar-group-header" onclick="toggleGroup('attentionGroup')">
             <i class="fa fa-triangle-exclamation group-icon"></i>
@@ -308,6 +355,7 @@
               <a href="reliability-alerts.html" class="active">
                 <span>Reliability Alerts</span>
                 <span class="nav-badge" id="sidebarAlertBadge" style="background:#e53935">4</span>
+                <i class="fa fa-bell" id="sidebarNotifIcon" style="display:none;font-size:11px;color:#1a73e8;margin-left:2px" title="Notifications enabled"></i>
               </a>
             </li>
           </ul>
@@ -356,10 +404,15 @@
 
       <!-- TOOLBAR -->
       <div class="toolbar">
-        <div class="toolbar-right" style="margin-left:0">
+        <div class="toolbar-right">
           <div class="icon-btn" title="Search"><i class="fa fa-search"></i></div>
           <div class="icon-btn" title="Export"><i class="fa fa-file-export"></i></div>
           <div class="icon-btn" title="Refresh"><i class="fa fa-rotate"></i></div>
+          <div class="toolbar-sep"></div>
+          <button class="btn" id="openNotifModalBtn" title="Configure email notifications for reliability alerts">
+            <i class="fa fa-bell-slash" id="notifBtnIcon"></i>
+            Configure Notifications
+          </button>
         </div>
       </div>
 
@@ -433,10 +486,6 @@
             <i class="fa fa-calendar"></i>
             <span id="panelFlagged">—</span>
           </div>
-          <div class="panel-info-row">
-            <i class="fa fa-user"></i>
-            <span id="panelAssigned">Unassigned</span>
-          </div>
         </div>
 
         <hr class="panel-divider" />
@@ -471,6 +520,71 @@
 
   </div><!-- /main-wrapper -->
 
+  <!-- ===== NOTIFICATION CONFIG MODAL ===== -->
+  <div id="notifModalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="notifModalTitle">
+    <div class="modal-card">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-icon-wrap"><i class="fa fa-bell"></i></span>
+          <div>
+            <div class="modal-title" id="notifModalTitle">Reliability Alert Notifications</div>
+            <div class="modal-subtitle">Send email alerts when a patch reliability score drops below threshold</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeNotifModalBtn" title="Close"><i class="fa fa-xmark"></i></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+
+        <!-- Row 1: Enable toggle -->
+        <div class="modal-row">
+          <div class="modal-row-info">
+            <div class="modal-row-label">Enable Notifications</div>
+            <div class="modal-row-desc">Receive emails whenever a reliability alert is triggered</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notifEnableToggle" onchange="handleNotifToggle(this)" />
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <!-- Rows 2-4: dimmed when disabled -->
+        <div id="notifSettingsBody" class="notif-disabled">
+
+          <!-- Row 2: Email recipients -->
+          <div class="modal-row modal-row-col">
+            <div class="modal-row-label">Email Recipients</div>
+            <div class="modal-row-desc" style="margin-bottom:12px">Notifications will be sent to all addresses listed below (max 10)</div>
+            <div class="email-chip-list" id="emailChipList"></div>
+            <div class="email-add-row">
+              <input type="email" id="emailInput" class="email-input"
+                placeholder="name@company.com"
+                onkeydown="handleEmailKeydown(event)" />
+              <button class="btn email-add-btn" onclick="addEmailChip()">
+                <i class="fa fa-plus"></i> Add
+              </button>
+            </div>
+            <div class="email-error" id="emailError"></div>
+          </div>
+
+        </div><!-- /notifSettingsBody -->
+
+      </div><!-- /modal-body -->
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button class="btn-save" onclick="saveNotifSettings()">Save Settings</button>
+        <button class="btn-cancel" onclick="closeNotifModal()">Cancel</button>
+      </div>
+
+    </div><!-- /modal-card -->
+  </div>
+  <!-- ===== END NOTIFICATION CONFIG MODAL ===== -->
+
   <script>
     /* ===== ALERT DATA ===== */
     const ALERT_DATA = [
@@ -482,7 +596,7 @@
         approveStatus:'Approved',
         approvalReason:'Approved for legacy system compliance',
         status:'unresolved', resolution:null,
-        assignedTo:null, flaggedDate:'May 15, 2026', affectedSystems:10
+        flaggedDate:'May 15, 2026', affectedSystems:10
       },
       {
         alertId:'ALT-002', patchId:'11943', bulletin:'MS12-035', sev:'critical',
@@ -492,7 +606,7 @@
         approveStatus:'Approved',
         approvalReason:'Approved during Q1 patch cycle',
         status:'unresolved', resolution:null,
-        assignedTo:'J. Martinez', flaggedDate:'May 14, 2026', affectedSystems:10
+        flaggedDate:'May 14, 2026', affectedSystems:10
       },
       {
         alertId:'ALT-003', patchId:'15979', bulletin:'MS14-045', sev:'warning',
@@ -502,7 +616,7 @@
         approveStatus:'Not Approved',
         approvalReason:'Pending security team review',
         status:'unresolved', resolution:null,
-        assignedTo:null, flaggedDate:'May 16, 2026', affectedSystems:10
+        flaggedDate:'May 16, 2026', affectedSystems:10
       },
       {
         alertId:'ALT-004', patchId:'98398', bulletin:'MSWU-465', sev:'low',
@@ -512,7 +626,7 @@
         approveStatus:'Declined',
         approvalReason:'Declined due to AV conflicts',
         status:'resolved', resolution:'declined',
-        assignedTo:'S. Patel', flaggedDate:'May 13, 2026', affectedSystems:10
+        flaggedDate:'May 13, 2026', affectedSystems:10
       },
       {
         alertId:'ALT-005', patchId:'100288', bulletin:'MSWU-1037', sev:'low',
@@ -522,7 +636,7 @@
         approveStatus:'Approved',
         approvalReason:'Auto-approved by AI rule: Win 10 updates',
         status:'unresolved', resolution:null,
-        assignedTo:null, flaggedDate:'May 17, 2026', affectedSystems:10
+        flaggedDate:'May 17, 2026', affectedSystems:10
       }
     ];
 
@@ -538,10 +652,10 @@
         return;
       }
       tbody.innerHTML = data.map(a => {
-        const statusLabel  = a.status === 'resolved' ? 'Resolved' : 'Unresolved';
-        const dotClass     = a.status === 'resolved' ? 'dot-resolved' : 'dot-unresolved';
-        const pillClass    = a.approveStatus.toLowerCase().replace(' ', '-');
-        const isSelected = a.alertId === currentAlertId ? 'selected' : '';
+        const statusLabel = a.status === 'resolved' ? 'Resolved' : 'Unresolved';
+        const dotClass    = a.status === 'resolved' ? 'dot-resolved' : 'dot-unresolved';
+        const pillClass   = a.approveStatus.toLowerCase().replace(' ', '-');
+        const isSelected  = a.alertId === currentAlertId ? 'selected' : '';
         return `
           <tr class="${isSelected}" onclick="openPanel('${a.alertId}')">
             <td>
@@ -550,7 +664,7 @@
                 <a href="#" onclick="event.stopPropagation()">${a.patchId}</a>
               </div>
             </td>
-            <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.desc}">${a.desc}</td>
+            <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.desc}">${a.desc}</td>
             <td><span class="score-badge score-red">${a.score.toFixed(1)}</span></td>
             <td><span class="approve-pill ${pillClass}">${a.approveStatus}</span></td>
             <td><span style="color:#777;font-size:12px">${a.approvalReason}</span></td>
@@ -583,7 +697,6 @@
     }
 
     function resolveAlertFromKebab(alertId, resolutionType) {
-      // Close all kebabs first
       document.querySelectorAll('.kebab-wrap.open').forEach(w => w.classList.remove('open'));
       const prev = currentAlertId;
       currentAlertId = alertId;
@@ -594,7 +707,6 @@
     /* ===== FILTER ===== */
     function setFilter(filter, tabEl) {
       currentFilter = filter;
-      // Update tabs
       document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
       if (tabEl) {
         tabEl.classList.add('active');
@@ -603,11 +715,9 @@
         const map  = { all:0, unresolved:1, resolved:2 };
         if (tabs[map[filter]] !== undefined) tabs[map[filter]].classList.add('active');
       }
-      // Update chips active state
       document.querySelectorAll('.stat-chip').forEach(c => c.classList.remove('chip-active'));
       const chipMap = { unresolved:'chipUnresolved', resolved:'chipResolved' };
       if (chipMap[filter]) document.getElementById(chipMap[filter]).classList.add('chip-active');
-
       const filtered = filter === 'all' ? ALERT_DATA : ALERT_DATA.filter(a => a.status === filter);
       renderAlerts(filtered);
     }
@@ -638,13 +748,11 @@
         `Score dropped from ${a.scorePrev.toFixed(1)} → ${a.score.toFixed(1)} over the last ${a.scoreDropHours} hours`;
       document.getElementById('panelAffected').textContent = `${a.affectedSystems} affected systems`;
       document.getElementById('panelFlagged').textContent  = `First flagged: ${a.flaggedDate}`;
-      document.getElementById('panelAssigned').textContent = a.assignedTo || 'Unassigned';
       document.getElementById('panelStatusSelect').value   = a.status;
 
       document.getElementById('detailPanel').classList.add('open');
       document.getElementById('mainContent').classList.add('panel-active');
 
-      // Highlight selected row
       document.querySelectorAll('#alertTableBody tr').forEach(tr => tr.classList.remove('selected'));
       const filtered = currentFilter === 'all' ? ALERT_DATA : ALERT_DATA.filter(x => x.status === currentFilter);
       const idx = filtered.findIndex(x => x.alertId === alertId);
@@ -728,14 +836,133 @@
       document.getElementById('overflowMenu').classList.remove('open');
     });
     document.addEventListener('click', e => {
-      // Close kebab menus
       document.querySelectorAll('.kebab-wrap.open').forEach(w => w.classList.remove('open'));
-      // Close topbar dropdowns (only when click is outside detail panel)
       if (!document.getElementById('detailPanel').contains(e.target)) {
         document.getElementById('overflowMenu').classList.remove('open');
         document.getElementById('userDropdown').classList.remove('open');
       }
     });
+
+    /* =====================================================
+       NOTIFICATION SETTINGS
+    ===================================================== */
+
+    let notifSettings = {
+      enabled: false,
+      emails: []
+    };
+
+    /* --- Open / Close --- */
+    function openNotifModal() {
+      // Sync UI to saved state
+      document.getElementById('notifEnableToggle').checked = notifSettings.enabled;
+      renderEmailChips();
+      syncNotifBody();
+      clearEmailError();
+      document.getElementById('notifModalOverlay').classList.add('open');
+    }
+
+    function closeNotifModal() {
+      document.getElementById('notifModalOverlay').classList.remove('open');
+      clearEmailError();
+    }
+
+    document.getElementById('openNotifModalBtn').addEventListener('click', openNotifModal);
+    document.getElementById('closeNotifModalBtn').addEventListener('click', closeNotifModal);
+    document.getElementById('notifModalOverlay').addEventListener('click', function (e) {
+      if (e.target === this) closeNotifModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && document.getElementById('notifModalOverlay').classList.contains('open')) {
+        closeNotifModal();
+      }
+    });
+
+    /* --- Enable toggle --- */
+    function handleNotifToggle(cb) {
+      syncNotifBody();
+    }
+
+    function syncNotifBody() {
+      const enabled = document.getElementById('notifEnableToggle').checked;
+      document.getElementById('notifSettingsBody').classList.toggle('notif-disabled', !enabled);
+
+      // Update toolbar button appearance to reflect saved state
+      const btn  = document.getElementById('openNotifModalBtn');
+      const icon = document.getElementById('notifBtnIcon');
+      btn.classList.toggle('notif-active', notifSettings.enabled);
+      icon.className = notifSettings.enabled ? 'fa fa-bell' : 'fa fa-bell-slash';
+
+      // Sidebar bell icon
+      const sidebarIcon = document.getElementById('sidebarNotifIcon');
+      if (sidebarIcon) sidebarIcon.style.display = notifSettings.enabled ? 'inline' : 'none';
+    }
+
+    /* --- Email chips --- */
+    function renderEmailChips() {
+      const list = document.getElementById('emailChipList');
+      if (!notifSettings.emails.length) { list.innerHTML = ''; return; }
+      list.innerHTML = notifSettings.emails.map(email => `
+        <span class="email-chip">
+          ${email}
+          <button class="email-chip-remove" onclick="removeEmailChip('${email}')" title="Remove">&times;</button>
+        </span>
+      `).join('');
+    }
+
+    function addEmailChip() {
+      const input = document.getElementById('emailInput');
+      const val   = input.value.trim().toLowerCase();
+      clearEmailError();
+      if (!val) return;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+        showEmailError('Please enter a valid email address.');
+        return;
+      }
+      if (notifSettings.emails.includes(val)) {
+        showEmailError('This address is already in the list.');
+        return;
+      }
+      if (notifSettings.emails.length >= 10) {
+        showEmailError('Maximum 10 recipients allowed.');
+        return;
+      }
+      notifSettings.emails.push(val);
+      renderEmailChips();
+      input.value = '';
+    }
+
+    function removeEmailChip(email) {
+      notifSettings.emails = notifSettings.emails.filter(e => e !== email);
+      renderEmailChips();
+    }
+
+    function handleEmailKeydown(e) {
+      if (e.key === 'Enter') { e.preventDefault(); addEmailChip(); }
+    }
+
+    function showEmailError(msg) {
+      document.getElementById('emailError').textContent = msg;
+      document.getElementById('emailInput').classList.add('input-error');
+    }
+
+    function clearEmailError() {
+      document.getElementById('emailError').textContent = '';
+      document.getElementById('emailInput').classList.remove('input-error');
+    }
+
+    /* --- Save --- */
+    function saveNotifSettings() {
+      const enabled = document.getElementById('notifEnableToggle').checked;
+      if (enabled && notifSettings.emails.length === 0) {
+        showEmailError('Add at least one recipient email address before saving.');
+        return;
+      }
+      notifSettings.enabled = enabled;
+
+      closeNotifModal();
+      syncNotifBody();  // update toolbar button + sidebar icon based on saved state
+    }
 
     /* ===== INIT ===== */
     updateStatChips();
