@@ -89,8 +89,7 @@
     .stat-chip:hover{border-color:#bbb}
     .stat-chip.chip-active{border-color:#1a73e8;background:#e8f0fe}
     .chip-count{font-size:24px;font-weight:700;line-height:1}
-    .chip-open .chip-count{color:#d32f2f}
-    .chip-review .chip-count{color:#f9a825}
+    .chip-unresolved .chip-count{color:#d32f2f}
     .chip-resolved .chip-count{color:#2e7d32}
 
     /* === FILTER TABS === */
@@ -116,11 +115,6 @@
     table.data-table tbody tr:hover{background:#f0f4ff}
     table.data-table tbody tr.selected{background:#e8f0fe}
     table.data-table td a{color:#1a73e8}
-    table.data-table td:first-child{width:6px;padding:0}
-    .sev-bar{display:block;width:4px;height:38px;border-radius:0 2px 2px 0}
-    .sev-bar.critical{background:#d32f2f}
-    .sev-bar.warning{background:#f9a825}
-    .sev-bar.low{background:#9e9e9e}
     .patch-id-cell{display:flex;align-items:center;gap:6px}
     .patch-icon{font-size:13px}
     .patch-icon.critical{color:#d32f2f}
@@ -131,23 +125,30 @@
     .score-badge{display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px;min-width:44px}
     .score-red{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
 
-    /* === TREND CELL === */
-    .trend-cell{font-size:12px;color:#666;white-space:nowrap}
-    .trend-arrow{color:#d32f2f;margin-right:3px}
+    /* === APPROVE STATUS PILL === */
+    .approve-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:500}
+    .approve-pill.approved{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+    .approve-pill.not-approved{background:#f5f5f5;color:#555;border:1px solid #ddd}
+    .approve-pill.declined{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
 
     /* === STATUS CELL === */
     .status-cell{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;white-space:nowrap}
-    .status-cell.open{color:#d32f2f}
-    .status-cell.in-review{color:#b45309}
+    .status-cell.unresolved{color:#d32f2f}
     .status-cell.resolved{color:#2e7d32}
     .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
-    .dot-open{background:#d32f2f}
-    .dot-review{background:#f9a825}
+    .dot-unresolved{background:#d32f2f}
     .dot-resolved{background:#2e7d32}
 
-    /* === ROW ACTION BUTTONS === */
-    .row-action-btn{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;border:1px solid #e0e0e0;background:#fff;color:#555;cursor:pointer;font-size:12px}
-    .row-action-btn:hover{background:#f0f4ff;color:#1a73e8;border-color:#1a73e8}
+    /* === KEBAB MENU === */
+    .kebab-wrap{position:relative;display:inline-block}
+    .kebab-btn{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;border:1px solid #e0e0e0;background:#fff;color:#555;cursor:pointer;font-size:14px;font-weight:700;letter-spacing:1px;line-height:1}
+    .kebab-btn:hover{background:#f0f4ff;color:#1a73e8;border-color:#1a73e8}
+    .kebab-menu{display:none;position:absolute;right:0;top:32px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.12);min-width:160px;z-index:300;overflow:hidden}
+    .kebab-wrap.open .kebab-menu{display:block}
+    .kebab-menu a,.kebab-menu button{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:13px;color:#333;background:none;border:none;width:100%;text-align:left;cursor:pointer;transition:background .1s}
+    .kebab-menu a:hover,.kebab-menu button:hover{background:#f0f4ff;color:#1a73e8}
+    .kebab-menu .danger{color:#d32f2f}
+    .kebab-menu .danger:hover{background:#ffebee;color:#d32f2f}
 
     /* === PAGINATION === */
     .table-pagination{display:flex;align-items:center;justify-content:flex-end;padding:10px 16px;font-size:12px;color:#666;border-top:1px solid #f0f0f0;background:#fff;gap:8px}
@@ -306,7 +307,7 @@
             <li>
               <a href="reliability-alerts.html" class="active">
                 <span>Reliability Alerts</span>
-                <span class="nav-badge" id="sidebarAlertBadge" style="background:#e53935">3</span>
+                <span class="nav-badge" id="sidebarAlertBadge" style="background:#e53935">4</span>
               </a>
             </li>
           </ul>
@@ -336,13 +337,9 @@
 
       <!-- STAT CHIPS -->
       <div class="stat-chips-row">
-        <div class="stat-chip chip-open" id="chipOpen" onclick="setFilter('open')">
-          <span class="chip-count" id="countOpen">3</span>
-          <span>Open</span>
-        </div>
-        <div class="stat-chip chip-review" id="chipReview" onclick="setFilter('in-review')">
-          <span class="chip-count" id="countReview">1</span>
-          <span>In Review</span>
+        <div class="stat-chip chip-unresolved" id="chipUnresolved" onclick="setFilter('unresolved')">
+          <span class="chip-count" id="countUnresolved">4</span>
+          <span>Unresolved</span>
         </div>
         <div class="stat-chip chip-resolved" id="chipResolved" onclick="setFilter('resolved')">
           <span class="chip-count" id="countResolved">1</span>
@@ -353,8 +350,7 @@
       <!-- FILTER TABS -->
       <div class="filter-tabs-bar">
         <button class="filter-tab active" onclick="setFilter('all',this)">All Alerts</button>
-        <button class="filter-tab" onclick="setFilter('open',this)">Open</button>
-        <button class="filter-tab" onclick="setFilter('in-review',this)">In Review</button>
+        <button class="filter-tab" onclick="setFilter('unresolved',this)">Unresolved</button>
         <button class="filter-tab" onclick="setFilter('resolved',this)">Resolved</button>
       </div>
 
@@ -374,12 +370,11 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th style="width:6px;padding:0"></th>
               <th>Patch ID</th>
               <th>Patch Name</th>
               <th>Reliability Score</th>
-              <th>Score Trend</th>
-              <th>First Flagged</th>
+              <th>Approve Status</th>
+              <th>Approval Reason</th>
               <th>Status</th>
               <th>Assigned To</th>
               <th>Actions</th>
@@ -453,8 +448,7 @@
         <div>
           <div class="panel-section-label">Status</div>
           <select class="panel-status-select" id="panelStatusSelect" onchange="updateStatus(this.value)" style="margin-top:8px">
-            <option value="open">Open</option>
-            <option value="in-review">In Review</option>
+            <option value="unresolved">Unresolved</option>
             <option value="resolved">Resolved</option>
           </select>
         </div>
@@ -466,11 +460,11 @@
             <a href="decline-patch-select.html" class="panel-action-btn btn-danger">
               <i class="fa fa-ban"></i> Decline Patch
             </a>
-            <button class="panel-action-btn btn-success" onclick="resolveAlert('kept-approved')">
-              <i class="fa fa-circle-check"></i> Keep Approved
+            <button class="panel-action-btn btn-success" onclick="resolveAlert('approved')">
+              <i class="fa fa-circle-check"></i> Approve Patch
             </button>
-            <button class="panel-action-btn btn-muted" onclick="resolveAlert('dismissed')">
-              <i class="fa fa-eye-slash"></i> Dismiss Alert
+            <button class="panel-action-btn btn-muted" onclick="resolveAlert('ignored')">
+              <i class="fa fa-eye-slash"></i> Ignore Alert
             </button>
           </div>
         </div>
@@ -488,7 +482,9 @@
         desc:'Security Update for Windows 7 (KB979482)',
         score:2.4, scorePrev:7.1, scoreDropHours:72,
         reason:'Targets a deprecated OS (Windows 7, EOL). No vendor support available; high risk of post-patch instability on remaining machines.',
-        status:'open', resolution:null,
+        approveStatus:'Approved',
+        approvalReason:'Approved for legacy system compliance',
+        status:'unresolved', resolution:null,
         assignedTo:null, flaggedDate:'May 15, 2026', affectedSystems:10
       },
       {
@@ -496,7 +492,9 @@
         desc:'Security Update for .NET Framework 3.5.1 (KB2604115)',
         score:3.1, scorePrev:7.8, scoreDropHours:48,
         reason:'Legacy framework patch with a known regression on KB2840628; conflicts with newer .NET runtime versions in production.',
-        status:'in-review', resolution:null,
+        approveStatus:'Approved',
+        approvalReason:'Approved during Q1 patch cycle',
+        status:'unresolved', resolution:null,
         assignedTo:'J. Martinez', flaggedDate:'May 14, 2026', affectedSystems:10
       },
       {
@@ -504,7 +502,9 @@
         desc:'Security Update for Windows 8 (KB2993651)',
         score:3.7, scorePrev:6.9, scoreDropHours:36,
         reason:'High post-install reboot failure rate; known incompatibility with Hyper-V guest environments detected during QA.',
-        status:'open', resolution:null,
+        approveStatus:'Not Approved',
+        approvalReason:'Pending security team review',
+        status:'unresolved', resolution:null,
         assignedTo:null, flaggedDate:'May 16, 2026', affectedSystems:10
       },
       {
@@ -512,6 +512,8 @@
         desc:'Update for Windows 8 (KB2784160)',
         score:4.3, scorePrev:7.0, scoreDropHours:60,
         reason:'Known conflicts with several third-party antivirus products; elevated installation failure rate observed across test machines.',
+        approveStatus:'Declined',
+        approvalReason:'Declined due to AV conflicts',
         status:'resolved', resolution:'declined',
         assignedTo:'S. Patel', flaggedDate:'May 13, 2026', affectedSystems:10
       },
@@ -520,7 +522,9 @@
         desc:'Update for Windows 8 (KB2977174)',
         score:4.8, scorePrev:6.2, scoreDropHours:24,
         reason:'Superseded by a newer rollup; partial compatibility issues noted on Windows 8.1 systems.',
-        status:'open', resolution:null,
+        approveStatus:'Approved',
+        approvalReason:'Auto-approved by AI rule: Win 10 updates',
+        status:'unresolved', resolution:null,
         assignedTo:null, flaggedDate:'May 17, 2026', affectedSystems:10
       }
     ];
@@ -533,21 +537,19 @@
       const tbody = document.getElementById('alertTableBody');
       document.getElementById('rowCount').textContent = data.length;
       if (!data.length) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#999;font-size:13px">No alerts found for this filter.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;font-size:13px">No alerts found for this filter.</td></tr>`;
         return;
       }
       tbody.innerHTML = data.map(a => {
-        const statusLabel = a.status === 'in-review' ? 'In Review' : a.status === 'resolved' ? 'Resolved' : 'Open';
-        const dotClass   = a.status === 'in-review' ? 'dot-review' : a.status === 'resolved' ? 'dot-resolved' : 'dot-open';
-        const resTag = a.resolution
-          ? `<span style="font-size:11px;color:#888;margin-left:4px">(${a.resolution.replace('-',' ')})</span>` : '';
+        const statusLabel  = a.status === 'resolved' ? 'Resolved' : 'Unresolved';
+        const dotClass     = a.status === 'resolved' ? 'dot-resolved' : 'dot-unresolved';
+        const pillClass    = a.approveStatus.toLowerCase().replace(' ', '-');
         const assignedHtml = a.assignedTo
           ? `<span style="display:inline-flex;align-items:center;gap:5px"><i class="fa fa-user" style="color:#aaa;font-size:11px"></i>${a.assignedTo}</span>`
           : `<span style="color:#bbb">Unassigned</span>`;
         const isSelected = a.alertId === currentAlertId ? 'selected' : '';
         return `
           <tr class="${isSelected}" onclick="openPanel('${a.alertId}')">
-            <td style="padding:0"><span class="sev-bar ${a.sev}"></span></td>
             <td>
               <div class="patch-id-cell">
                 <i class="fa fa-square patch-icon ${a.sev}"></i>
@@ -556,23 +558,44 @@
             </td>
             <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.desc}">${a.desc}</td>
             <td><span class="score-badge score-red">${a.score.toFixed(1)}</span></td>
-            <td>
-              <span class="trend-cell">
-                <i class="fa fa-arrow-trend-down trend-arrow"></i>${a.scorePrev.toFixed(1)} → ${a.score.toFixed(1)} over ${a.scoreDropHours}h
-              </span>
-            </td>
-            <td style="color:#666;font-size:12px">${a.flaggedDate}</td>
+            <td><span class="approve-pill ${pillClass}">${a.approveStatus}</span></td>
+            <td><span style="color:#777;font-size:12px">${a.approvalReason}</span></td>
             <td>
               <span class="status-cell ${a.status}">
-                <span class="status-dot ${dotClass}"></span>${statusLabel}${resTag}
+                <span class="status-dot ${dotClass}"></span>${statusLabel}
               </span>
             </td>
             <td>${assignedHtml}</td>
             <td onclick="event.stopPropagation()">
-              <button class="row-action-btn" title="Review" onclick="openPanel('${a.alertId}')"><i class="fa fa-magnifying-glass"></i></button>
+              <div class="kebab-wrap" id="kebab-${a.alertId}">
+                <button class="kebab-btn" onclick="toggleKebab('${a.alertId}',event)" title="Actions">•••</button>
+                <div class="kebab-menu">
+                  <a href="decline-patch-select.html" class="danger"><i class="fa fa-ban"></i> Decline Patch</a>
+                  <button onclick="resolveAlertFromKebab('${a.alertId}','approved')"><i class="fa fa-circle-check" style="color:#2e7d32"></i> Approve Patch</button>
+                  <button onclick="resolveAlertFromKebab('${a.alertId}','ignored')"><i class="fa fa-eye-slash" style="color:#888"></i> Ignore Alert</button>
+                </div>
+              </div>
             </td>
           </tr>`;
       }).join('');
+    }
+
+    /* ===== KEBAB MENU ===== */
+    function toggleKebab(alertId, e) {
+      e.stopPropagation();
+      const wrap = document.getElementById('kebab-' + alertId);
+      const isOpen = wrap.classList.contains('open');
+      document.querySelectorAll('.kebab-wrap.open').forEach(w => w.classList.remove('open'));
+      if (!isOpen) wrap.classList.add('open');
+    }
+
+    function resolveAlertFromKebab(alertId, resolutionType) {
+      // Close all kebabs first
+      document.querySelectorAll('.kebab-wrap.open').forEach(w => w.classList.remove('open'));
+      const prev = currentAlertId;
+      currentAlertId = alertId;
+      resolveAlert(resolutionType);
+      currentAlertId = prev;
     }
 
     /* ===== FILTER ===== */
@@ -580,16 +603,16 @@
       currentFilter = filter;
       // Update tabs
       document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-      if (tabEl) { tabEl.classList.add('active'); }
-      else {
-        // called from chip — find matching tab by position
+      if (tabEl) {
+        tabEl.classList.add('active');
+      } else {
         const tabs = document.querySelectorAll('.filter-tab');
-        const map  = { all:0, open:1, 'in-review':2, resolved:3 };
-        if (tabs[map[filter]]) tabs[map[filter]].classList.add('active');
+        const map  = { all:0, unresolved:1, resolved:2 };
+        if (tabs[map[filter]] !== undefined) tabs[map[filter]].classList.add('active');
       }
       // Update chips active state
       document.querySelectorAll('.stat-chip').forEach(c => c.classList.remove('chip-active'));
-      const chipMap = { open:'chipOpen', 'in-review':'chipReview', resolved:'chipResolved' };
+      const chipMap = { unresolved:'chipUnresolved', resolved:'chipResolved' };
       if (chipMap[filter]) document.getElementById(chipMap[filter]).classList.add('chip-active');
 
       const filtered = filter === 'all' ? ALERT_DATA : ALERT_DATA.filter(a => a.status === filter);
@@ -598,13 +621,11 @@
 
     /* ===== STAT CHIPS ===== */
     function updateStatChips() {
-      const open     = ALERT_DATA.filter(a => a.status === 'open').length;
-      const inReview = ALERT_DATA.filter(a => a.status === 'in-review').length;
-      const resolved = ALERT_DATA.filter(a => a.status === 'resolved').length;
-      document.getElementById('countOpen').textContent    = open;
-      document.getElementById('countReview').textContent  = inReview;
-      document.getElementById('countResolved').textContent= resolved;
-      document.getElementById('sidebarAlertBadge').textContent = open;
+      const unresolved = ALERT_DATA.filter(a => a.status === 'unresolved').length;
+      const resolved   = ALERT_DATA.filter(a => a.status === 'resolved').length;
+      document.getElementById('countUnresolved').textContent = unresolved;
+      document.getElementById('countResolved').textContent   = resolved;
+      document.getElementById('sidebarAlertBadge').textContent = unresolved;
     }
 
     /* ===== DETAIL PANEL ===== */
@@ -618,7 +639,7 @@
       sevBadge.textContent = a.sev;
       sevBadge.className = 'sev-badge ' + a.sev;
 
-      document.getElementById('panelScore').textContent = a.score.toFixed(1);
+      document.getElementById('panelScore').textContent  = a.score.toFixed(1);
       document.getElementById('panelReason').textContent = a.reason;
       document.getElementById('panelTrend').textContent  =
         `Score dropped from ${a.scorePrev.toFixed(1)} → ${a.score.toFixed(1)} over the last ${a.scoreDropHours} hours`;
@@ -632,9 +653,9 @@
 
       // Highlight selected row
       document.querySelectorAll('#alertTableBody tr').forEach(tr => tr.classList.remove('selected'));
-      const rows = document.querySelectorAll('#alertTableBody tr');
       const filtered = currentFilter === 'all' ? ALERT_DATA : ALERT_DATA.filter(x => x.status === currentFilter);
       const idx = filtered.findIndex(x => x.alertId === alertId);
+      const rows = document.querySelectorAll('#alertTableBody tr');
       if (rows[idx]) rows[idx].classList.add('selected');
     }
 
@@ -654,7 +675,6 @@
       updateStatChips();
       const filtered = currentFilter === 'all' ? ALERT_DATA : ALERT_DATA.filter(x => x.status === currentFilter);
       renderAlerts(filtered);
-      // Re-highlight panel row
       if (currentAlertId) {
         document.querySelectorAll('#alertTableBody tr').forEach(tr => tr.classList.remove('selected'));
         const idx = filtered.findIndex(x => x.alertId === currentAlertId);
@@ -674,7 +694,6 @@
       const filtered = currentFilter === 'all' ? ALERT_DATA : ALERT_DATA.filter(x => x.status === currentFilter);
       renderAlerts(filtered);
       if (currentFilter === 'resolved' || currentFilter === 'all') {
-        // keep panel open and re-highlight
         const idx = filtered.findIndex(x => x.alertId === currentAlertId);
         const rows = document.querySelectorAll('#alertTableBody tr');
         document.querySelectorAll('#alertTableBody tr').forEach(tr => tr.classList.remove('selected'));
@@ -716,6 +735,9 @@
       document.getElementById('overflowMenu').classList.remove('open');
     });
     document.addEventListener('click', e => {
+      // Close kebab menus
+      document.querySelectorAll('.kebab-wrap.open').forEach(w => w.classList.remove('open'));
+      // Close topbar dropdowns (only when click is outside detail panel)
       if (!document.getElementById('detailPanel').contains(e.target)) {
         document.getElementById('overflowMenu').classList.remove('open');
         document.getElementById('userDropdown').classList.remove('open');
