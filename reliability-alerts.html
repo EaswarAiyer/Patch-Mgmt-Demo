@@ -356,9 +356,7 @@
 
       <!-- TOOLBAR -->
       <div class="toolbar">
-        <button class="btn"><i class="fa fa-user-check"></i> Assign to Me</button>
-        <button class="btn"><i class="fa fa-check-double"></i> Bulk Resolve <i class="fa fa-caret-down" style="font-size:11px"></i></button>
-        <div class="toolbar-right">
+        <div class="toolbar-right" style="margin-left:0">
           <div class="icon-btn" title="Search"><i class="fa fa-search"></i></div>
           <div class="icon-btn" title="Export"><i class="fa fa-file-export"></i></div>
           <div class="icon-btn" title="Refresh"><i class="fa fa-rotate"></i></div>
@@ -376,7 +374,6 @@
               <th>Approve Status</th>
               <th>Approval Reason</th>
               <th>Status</th>
-              <th>Assigned To</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -537,16 +534,13 @@
       const tbody = document.getElementById('alertTableBody');
       document.getElementById('rowCount').textContent = data.length;
       if (!data.length) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;font-size:13px">No alerts found for this filter.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;font-size:13px">No alerts found for this filter.</td></tr>`;
         return;
       }
       tbody.innerHTML = data.map(a => {
         const statusLabel  = a.status === 'resolved' ? 'Resolved' : 'Unresolved';
         const dotClass     = a.status === 'resolved' ? 'dot-resolved' : 'dot-unresolved';
         const pillClass    = a.approveStatus.toLowerCase().replace(' ', '-');
-        const assignedHtml = a.assignedTo
-          ? `<span style="display:inline-flex;align-items:center;gap:5px"><i class="fa fa-user" style="color:#aaa;font-size:11px"></i>${a.assignedTo}</span>`
-          : `<span style="color:#bbb">Unassigned</span>`;
         const isSelected = a.alertId === currentAlertId ? 'selected' : '';
         return `
           <tr class="${isSelected}" onclick="openPanel('${a.alertId}')">
@@ -565,7 +559,6 @@
                 <span class="status-dot ${dotClass}"></span>${statusLabel}
               </span>
             </td>
-            <td>${assignedHtml}</td>
             <td onclick="event.stopPropagation()">
               <div class="kebab-wrap" id="kebab-${a.alertId}">
                 <button class="kebab-btn" onclick="toggleKebab('${a.alertId}',event)" title="Actions">•••</button>
