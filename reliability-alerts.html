@@ -98,6 +98,14 @@
     .filter-tab:hover{color:#1a73e8}
     .filter-tab.active{color:#1a73e8;border-bottom-color:#1a73e8;font-weight:600}
 
+    /* === AUTO-DECLINE BAR === */
+    .auto-decline-bar{display:flex;align-items:center;gap:12px;padding:10px 28px;background:#fffbf0;border-bottom:1px solid #ffe082}
+    .auto-decline-bar.inactive{background:#f8f9fa;border-bottom-color:#e8e8e8}
+    .adb-label{font-size:13px;font-weight:500;color:#5d4037;flex:1}
+    .adb-label.inactive{color:#777}
+    .adb-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
+    .adb-badge-hidden{display:none}
+
     /* === TOOLBAR === */
     .toolbar{display:flex;align-items:center;gap:8px;padding:10px 28px;background:#fff;border-bottom:1px solid #e8e8e8}
     .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:13px;font-weight:500;border:1px solid #dadce0;border-radius:4px;background:#fff;color:#333;cursor:pointer;transition:all .15s;white-space:nowrap}
@@ -400,6 +408,21 @@
         <button class="filter-tab active" onclick="setFilter('all',this)">All Alerts</button>
         <button class="filter-tab" onclick="setFilter('unresolved',this)">Unresolved</button>
         <button class="filter-tab" onclick="setFilter('resolved',this)">Resolved</button>
+      </div>
+
+      <!-- AUTO-DECLINE BAR -->
+      <div class="auto-decline-bar inactive" id="autoDeclineBar">
+        <label class="toggle-switch" title="Auto-decline patches scoring below 5">
+          <input type="checkbox" id="autoDeclineToggle" onchange="handleAutoDecline(this)" />
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+        <span class="adb-label inactive" id="autoDeclineLabel">
+          Auto-decline patches with low reliability score throughout the organization.
+        </span>
+        <span class="adb-badge adb-badge-hidden" id="autoDeclineBadge">
+          <i class="fa fa-robot"></i> <span id="autoDeclineCount">0</span> auto-declined
+        </span>
       </div>
 
       <!-- TOOLBAR -->
@@ -962,6 +985,52 @@
 
       closeNotifModal();
       syncNotifBody();  // update toolbar button + sidebar icon based on saved state
+    }
+
+    /* ===== AUTO-DECLINE ===== */
+    function handleAutoDecline(cb) {
+      const bar    = document.getElementById('autoDeclineBar');
+      const label  = document.getElementById('autoDeclineLabel');
+      const badge  = document.getElementById('autoDeclineBadge');
+
+      if (cb.checked) {
+        // Apply: auto-decline all unresolved alerts with score < 5
+        let count = 0;
+        ALERT_DATA.forEach(a => {
+          if (a.status === 'unresolved' && a.score < 5) {
+            a.status     = 'resolved';
+            a.resolution = 'auto-declined';
+            count++;
+          }
+        });
+
+        bar.classList.remove('inactive');
+        label.classList.remove('inactive');
+        document.getElementById('autoDeclineCount').textContent = count;
+        badge.classList.remove('adb-badge-hidden');
+
+        // Close detail panel if the open alert was just auto-declined
+        if (currentAlertId) {
+          const a = ALERT_DATA.find(x => x.alertId === currentAlertId);
+          if (a && a.resolution === 'auto-declined') closePanel();
+        }
+      } else {
+        // Revert: restore auto-declined alerts to unresolved
+        ALERT_DATA.forEach(a => {
+          if (a.resolution === 'auto-declined') {
+            a.status     = 'unresolved';
+            a.resolution = null;
+          }
+        });
+
+        bar.classList.add('inactive');
+        label.classList.add('inactive');
+        badge.classList.add('adb-badge-hidden');
+      }
+
+      updateStatChips();
+      const filtered = currentFilter === 'all' ? ALERT_DATA : ALERT_DATA.filter(x => x.status === currentFilter);
+      renderAlerts(filtered);
     }
 
     /* ===== INIT ===== */
