@@ -91,16 +91,40 @@
 
     /* === APPROVAL SECTION CARD === */
     .approval-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;margin:20px 28px;overflow:hidden}
-    .approval-row{display:flex;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid #f0f0f0}
-    .approval-row:last-child{border-bottom:none}
-    .approval-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-    .approval-icon.ai{background:#e8f0fe;color:#1a73e8}
-    .approval-icon.shield{background:#e8f5e9;color:#2e7d32}
-    .approval-icon.manual{background:#f3e5f5;color:#7b1fa2}
-    .approval-info{flex:1}
-    .approval-title{font-size:14px;font-weight:600;color:#333;display:flex;align-items:center;gap:8px;margin-bottom:3px}
     .early-access-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#fff3e0;color:#e65100;border:1px solid #ffcc80}
-    .approval-desc{font-size:12.5px;color:#777}
+
+    /* === APPROVAL OPTION ROWS === */
+    .apo-row{border-bottom:1px solid #f0f0f0;border-left:4px solid transparent;transition:background .2s}
+    .apo-row:last-child{border-bottom:none}
+    .apo-row--risk{border-left-color:#f57c00}
+    .apo-row--ai{border-left-color:#1a73e8}
+    .apo-row--manual{border-left-color:#7b1fa2}
+    .apo-row--risk.is-active{background:#fffbf5}
+    .apo-row--ai.is-active{background:#f8fbff}
+    .apo-row--manual.is-active{background:#fdf8ff}
+    .apo-row-main{display:flex;align-items:flex-start;gap:20px;padding:22px 28px}
+    .apo-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;margin-top:2px}
+    .apo-icon--ai{background:#e8f0fe;color:#1a73e8}
+    .apo-icon--risk{background:#fff8e1;color:#f57c00}
+    .apo-icon--manual{background:#f3e5f5;color:#7b1fa2}
+    .apo-body{flex:1;min-width:0}
+    .apo-title{font-size:15px;font-weight:700;color:#222;display:flex;align-items:center;gap:8px;margin-bottom:5px;line-height:1.3}
+    .apo-desc{font-size:13px;color:#666;line-height:1.6;margin-bottom:10px;max-width:560px}
+    .apo-bestfor{display:flex;align-items:baseline;gap:6px;padding:7px 12px;border-radius:6px;font-size:12px;line-height:1.55;max-width:560px}
+    .apo-bestfor-label{font-weight:700;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px}
+    .apo-bestfor-label i{font-size:10px}
+    .apo-bestfor--ai{background:#e8f0fe;color:#1a56b0}
+    .apo-bestfor--ai .apo-bestfor-label{color:#1a73e8}
+    .apo-bestfor--risk{background:#fff8e1;color:#7a4b00}
+    .apo-bestfor--risk .apo-bestfor-label{color:#f57c00}
+    .apo-bestfor--manual{background:#f3e5f5;color:#4a0066}
+    .apo-bestfor--manual .apo-bestfor-label{color:#7b1fa2}
+    .apo-row-main .toggle-switch{flex-shrink:0;margin-top:4px}
+
+    /* === EXPANDABLE SUB-PANELS === */
+    .apo-subpanel{border-top:1px solid #f0f0f0;padding:20px 28px 24px}
+    .apo-subpanel--ai{background:#f5f8ff}
+    .apo-subpanel--manual{background:#fdf8ff}
 
     /* === TOGGLE SWITCH === */
     .toggle-switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;cursor:pointer}
@@ -111,7 +135,7 @@
     .toggle-switch input:checked ~ .toggle-thumb{transform:translateX(20px)}
 
     /* === AI RULES AREA === */
-    .ai-rules-area{background:#f8f9fb;border-top:1px solid #f0f0f0;padding:16px 24px 20px}
+    .ai-rules-area{padding:0}
     .add-rule-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:13px;font-weight:500;border:1px solid #1a73e8;border-radius:4px;color:#1a73e8;background:#fff;cursor:pointer;margin-bottom:14px;transition:all .15s}
     .add-rule-btn:hover{background:#e8f0fe}
     .rules-grid{display:flex;gap:14px;flex-wrap:wrap}
@@ -133,15 +157,15 @@
     .rule-card-menu a.danger{color:#d32f2f}
 
     /* === EXISTING PATCHES SUB-SECTION === */
-    .existing-patches-row{display:flex;align-items:center;gap:20px;padding:14px 24px;background:#fafbfd;border-top:1px solid #f0f0f0}
-    .existing-patches-label{font-size:13px;color:#555;font-weight:500;min-width:180px}
+    .existing-patches-row{display:flex;align-items:center;gap:20px;margin-bottom:16px;flex-wrap:wrap}
+    .existing-patches-label{font-size:13px;color:#444;font-weight:600;min-width:180px}
     .radio-group{display:flex;gap:20px;flex-wrap:wrap}
     .radio-label{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#333;cursor:pointer}
     .radio-label input[type=radio]{accent-color:#1a73e8;width:15px;height:15px;cursor:pointer}
     .radio-help{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1px solid #bbb;font-size:10px;color:#888;cursor:help;margin-left:2px}
 
     /* === FORM ACTIONS === */
-    .form-actions-row{display:flex;align-items:center;gap:10px;padding:16px 24px;border-top:1px solid #f0f0f0}
+    .form-actions-row{display:flex;align-items:center;gap:10px;padding-top:4px}
     .btn-save{padding:8px 22px;background:#1a73e8;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
     .btn-save:hover{background:#1557b0}
     .btn-cancel{padding:8px 18px;background:#fff;color:#333;border:1px solid #dadce0;border-radius:4px;font-size:13px;cursor:pointer;transition:all .15s}
@@ -333,18 +357,40 @@
       <!-- Approval options card -->
       <div class="approval-card">
 
-        <!-- Row 1: AI-Enhanced -->
-        <div class="approval-row" style="flex-wrap:wrap;gap:0;padding:0">
-          <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;width:100%">
-            <div class="approval-icon ai">
-              <i class="fa fa-wand-magic-sparkles"></i>
+        <!-- Row 1: Approve Without Testing -->
+        <div class="apo-row apo-row--risk" id="rowNoTest">
+          <div class="apo-row-main">
+            <div class="apo-icon apo-icon--risk"><i class="fa fa-shield"></i></div>
+            <div class="apo-body">
+              <div class="apo-title">Approve Without Testing</div>
+              <div class="apo-desc">Instantly approve and deploy patches without validation. Use only when delay poses a greater risk than skipping testing.</div>
+              <div class="apo-bestfor apo-bestfor--risk">
+                <span class="apo-bestfor-label"><i class="fa fa-bullseye"></i> Best for:</span>
+                Zero-day exploits, emergency security patches, and vendor-mandated critical updates where every hour of delay increases exposure.
+              </div>
             </div>
-            <div class="approval-info">
-              <div class="approval-title">
-                AI-Enhanced Autonomous Testing and Approval
+            <label class="toggle-switch" title="Toggle approve without testing">
+              <input type="checkbox" id="toggleNoTest" onchange="handleExclusiveToggle('toggleNoTest')" />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Row 2: AI-Enhanced -->
+        <div class="apo-row apo-row--ai is-active" id="rowAI">
+          <div class="apo-row-main">
+            <div class="apo-icon apo-icon--ai"><i class="fa fa-wand-magic-sparkles"></i></div>
+            <div class="apo-body">
+              <div class="apo-title">
+                AI-Enhanced Autonomous Testing
                 <span class="early-access-badge">Early Access</span>
               </div>
-              <div class="approval-desc">AI-powered autonomous testing with intelligent risk analysis and automatic approval</div>
+              <div class="apo-desc">AI validates, tests, and approves patches automatically — no manual intervention required.</div>
+              <div class="apo-bestfor apo-bestfor--ai">
+                <span class="apo-bestfor-label"><i class="fa fa-bullseye"></i> Best for:</span>
+                Patches that are not time-critical and don't target high-impact systems. Ideal when the team lacks bandwidth for hands-on testing.
+              </div>
             </div>
             <label class="toggle-switch" title="Toggle AI-Enhanced mode">
               <input type="checkbox" id="toggleAI" checked onchange="handleAIToggle(this)" />
@@ -352,9 +398,8 @@
               <div class="toggle-thumb"></div>
             </label>
           </div>
-
-          <!-- AI rules area -->
-          <div class="ai-rules-area" id="aiRulesArea" style="width:100%">
+          <!-- AI rules sub-panel -->
+          <div class="apo-subpanel apo-subpanel--ai" id="aiRulesArea">
             <button class="add-rule-btn" onclick="showAddRuleModal()">
               <i class="fa fa-plus"></i> Add Rule
             </button>
@@ -419,15 +464,17 @@
           </div>
         </div>
 
-        <!-- Row 2: Manual Testing -->
-        <div class="approval-row" style="flex-wrap:wrap;gap:0;padding:0">
-          <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;width:100%">
-            <div class="approval-icon manual">
-              <i class="fa fa-user-gear"></i>
-            </div>
-            <div class="approval-info">
-              <div class="approval-title">Manual Testing and Approval</div>
-              <div class="approval-desc">Manually test patches before deploying to all computers</div>
+        <!-- Row 3: Manual Testing -->
+        <div class="apo-row apo-row--manual" id="rowManual">
+          <div class="apo-row-main">
+            <div class="apo-icon apo-icon--manual"><i class="fa fa-user-gear"></i></div>
+            <div class="apo-body">
+              <div class="apo-title">Manual Testing and Approval</div>
+              <div class="apo-desc">Patches are held for human review and sign-off before deployment to any system.</div>
+              <div class="apo-bestfor apo-bestfor--manual">
+                <span class="apo-bestfor-label"><i class="fa fa-bullseye"></i> Best for:</span>
+                Patches targeting business-critical applications, custom-configured environments, or systems that require stakeholder approval before rollout.
+              </div>
             </div>
             <label class="toggle-switch" title="Toggle manual testing">
               <input type="checkbox" id="toggleManual" onchange="handleManualToggle(this)" />
@@ -435,45 +482,28 @@
               <div class="toggle-thumb"></div>
             </label>
           </div>
-
-          <!-- Sub-section: existing patches (shown when manual is ON) -->
-          <div class="existing-patches-row" id="existingPatchesRow" style="display:none;width:100%">
-            <span class="existing-patches-label">For the Existing Patches</span>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="existingPatches" value="retain" checked />
-                Retain Approval Status
-                <span class="radio-help" title="Keeps the current approval status for patches that were previously approved or declined">?</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="existingPatches" value="not-approved" />
-                Mark Patch as Not Approved
-                <span class="radio-help" title="Resets all existing patches to 'Not Approved', requiring manual re-approval">?</span>
-              </label>
+          <!-- Manual sub-panel -->
+          <div class="apo-subpanel apo-subpanel--manual" id="manualSubpanel" style="display:none">
+            <div class="existing-patches-row">
+              <span class="existing-patches-label">For the Existing Patches</span>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="existingPatches" value="retain" checked />
+                  Retain Approval Status
+                  <span class="radio-help" title="Keeps the current approval status for patches that were previously approved or declined">?</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="existingPatches" value="not-approved" />
+                  Mark Patch as Not Approved
+                  <span class="radio-help" title="Resets all existing patches to 'Not Approved', requiring manual re-approval">?</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-actions-row">
+              <button class="btn-save">Save changes</button>
+              <button class="btn-cancel" onclick="cancelManual()">Cancel</button>
             </div>
           </div>
-
-          <!-- Save / Cancel (shown when manual is ON) -->
-          <div class="form-actions-row" id="formActionsRow" style="display:none;width:100%">
-            <button class="btn-save">Save changes</button>
-            <button class="btn-cancel" onclick="cancelManual()">Cancel</button>
-          </div>
-        </div>
-
-        <!-- Row 3: Approve without testing -->
-        <div class="approval-row" style="border-bottom:none">
-          <div class="approval-icon shield">
-            <i class="fa fa-shield"></i>
-          </div>
-          <div class="approval-info">
-            <div class="approval-title">Approve without testing</div>
-            <div class="approval-desc">Automatically approve and deploy patches without any testing</div>
-          </div>
-          <label class="toggle-switch" title="Toggle approve without testing">
-            <input type="checkbox" id="toggleNoTest" onchange="handleExclusiveToggle('toggleNoTest')" />
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
         </div>
 
       </div>
@@ -631,46 +661,47 @@
     /* ===== AI TOGGLE ===== */
     function handleAIToggle(cb) {
       document.getElementById('aiRulesArea').style.display = cb.checked ? 'block' : 'none';
+      document.getElementById('rowAI').classList.toggle('is-active', cb.checked);
       if (cb.checked) {
         document.getElementById('toggleNoTest').checked = false;
+        document.getElementById('rowNoTest').classList.remove('is-active');
         document.getElementById('toggleManual').checked = false;
-        document.getElementById('existingPatchesRow').style.display = 'none';
-        document.getElementById('formActionsRow').style.display = 'none';
+        document.getElementById('rowManual').classList.remove('is-active');
+        document.getElementById('manualSubpanel').style.display = 'none';
       }
     }
 
     /* ===== APPROVE WITHOUT TESTING TOGGLE ===== */
     function handleExclusiveToggle(id) {
       const cb = document.getElementById(id);
+      document.getElementById('rowNoTest').classList.toggle('is-active', cb.checked);
       if (cb.checked) {
         document.getElementById('toggleAI').checked = false;
         document.getElementById('aiRulesArea').style.display = 'none';
+        document.getElementById('rowAI').classList.remove('is-active');
         document.getElementById('toggleManual').checked = false;
-        document.getElementById('existingPatchesRow').style.display = 'none';
-        document.getElementById('formActionsRow').style.display = 'none';
+        document.getElementById('rowManual').classList.remove('is-active');
+        document.getElementById('manualSubpanel').style.display = 'none';
       }
     }
 
     /* ===== MANUAL TOGGLE ===== */
     function handleManualToggle(cb) {
-      const epRow = document.getElementById('existingPatchesRow');
-      const faRow = document.getElementById('formActionsRow');
+      document.getElementById('rowManual').classList.toggle('is-active', cb.checked);
+      document.getElementById('manualSubpanel').style.display = cb.checked ? 'block' : 'none';
       if (cb.checked) {
         document.getElementById('toggleAI').checked = false;
         document.getElementById('aiRulesArea').style.display = 'none';
+        document.getElementById('rowAI').classList.remove('is-active');
         document.getElementById('toggleNoTest').checked = false;
-        epRow.style.display = 'flex';
-        faRow.style.display = 'flex';
-      } else {
-        epRow.style.display = 'none';
-        faRow.style.display = 'none';
+        document.getElementById('rowNoTest').classList.remove('is-active');
       }
     }
 
     function cancelManual() {
       document.getElementById('toggleManual').checked = false;
-      document.getElementById('existingPatchesRow').style.display = 'none';
-      document.getElementById('formActionsRow').style.display = 'none';
+      document.getElementById('rowManual').classList.remove('is-active');
+      document.getElementById('manualSubpanel').style.display = 'none';
     }
 
     /* ===== RULE CARD MENU ===== */
