@@ -109,16 +109,7 @@
     .apo-icon--manual{background:#f3e5f5;color:#7b1fa2}
     .apo-body{flex:1;min-width:0}
     .apo-title{font-size:15px;font-weight:700;color:#222;display:flex;align-items:center;gap:8px;margin-bottom:5px;line-height:1.3}
-    .apo-desc{font-size:13px;color:#666;line-height:1.6;margin-bottom:10px;max-width:560px}
-    .apo-bestfor{display:flex;align-items:baseline;gap:6px;padding:7px 12px;border-radius:6px;font-size:12px;line-height:1.55;max-width:560px}
-    .apo-bestfor-label{font-weight:700;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px}
-    .apo-bestfor-label i{font-size:10px}
-    .apo-bestfor--ai{background:#e8f0fe;color:#1a56b0}
-    .apo-bestfor--ai .apo-bestfor-label{color:#1a73e8}
-    .apo-bestfor--risk{background:#fff8e1;color:#7a4b00}
-    .apo-bestfor--risk .apo-bestfor-label{color:#f57c00}
-    .apo-bestfor--manual{background:#f3e5f5;color:#4a0066}
-    .apo-bestfor--manual .apo-bestfor-label{color:#7b1fa2}
+    .apo-desc{font-size:13px;color:#666;line-height:1.6;margin-bottom:0;max-width:560px}
     .apo-row-main .toggle-switch{flex-shrink:0;margin-top:4px}
 
     /* === EXPANDABLE SUB-PANELS === */
@@ -363,11 +354,7 @@
             <div class="apo-icon apo-icon--risk"><i class="fa fa-shield"></i></div>
             <div class="apo-body">
               <div class="apo-title">Approve Without Testing</div>
-              <div class="apo-desc">Instantly approve and deploy patches without validation. Use only when delay poses a greater risk than skipping testing.</div>
-              <div class="apo-bestfor apo-bestfor--risk">
-                <span class="apo-bestfor-label"><i class="fa fa-bullseye"></i> Best for:</span>
-                Zero-day exploits, emergency security patches, and vendor-mandated critical updates where every hour of delay increases exposure.
-              </div>
+              <div class="apo-desc">Instantly approve and deploy patches without any validation testing — use for zero-day exploits, emergency security fixes, and vendor-mandated critical updates where every hour of delay increases exposure.</div>
             </div>
             <label class="toggle-switch" title="Toggle approve without testing">
               <input type="checkbox" id="toggleNoTest" onchange="handleExclusiveToggle('toggleNoTest')" />
@@ -386,11 +373,7 @@
                 AI-Enhanced Autonomous Testing
                 <span class="early-access-badge">Early Access</span>
               </div>
-              <div class="apo-desc">AI validates, tests, and approves patches automatically — no manual intervention required.</div>
-              <div class="apo-bestfor apo-bestfor--ai">
-                <span class="apo-bestfor-label"><i class="fa fa-bullseye"></i> Best for:</span>
-                Patches that are not time-critical and don't target high-impact systems. Ideal when the team lacks bandwidth for hands-on testing.
-              </div>
+              <div class="apo-desc">AI validates and approves patches automatically with no manual intervention — ideal for non-critical patches when the team lacks bandwidth for hands-on testing.</div>
             </div>
             <label class="toggle-switch" title="Toggle AI-Enhanced mode">
               <input type="checkbox" id="toggleAI" checked onchange="handleAIToggle(this)" />
@@ -470,11 +453,7 @@
             <div class="apo-icon apo-icon--manual"><i class="fa fa-user-gear"></i></div>
             <div class="apo-body">
               <div class="apo-title">Manual Testing and Approval</div>
-              <div class="apo-desc">Patches are held for human review and sign-off before deployment to any system.</div>
-              <div class="apo-bestfor apo-bestfor--manual">
-                <span class="apo-bestfor-label"><i class="fa fa-bullseye"></i> Best for:</span>
-                Patches targeting business-critical applications, custom-configured environments, or systems that require stakeholder approval before rollout.
-              </div>
+              <div class="apo-desc">Patches are held for human review and sign-off before deployment — designed for business-critical applications, custom-configured environments, and any system requiring stakeholder approval before rollout.</div>
             </div>
             <label class="toggle-switch" title="Toggle manual testing">
               <input type="checkbox" id="toggleManual" onchange="handleManualToggle(this)" />
