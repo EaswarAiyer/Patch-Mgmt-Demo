@@ -89,6 +89,22 @@
     .breadcrumb .bc-current{color:#555}
     .page-subtitle{font-size:13px;color:#666}
 
+    /* === APPROVAL ATTENTION SUMMARY === */
+    .attention-summary{margin:20px 28px 0}
+    .attention-summary-title{font-size:14px;font-weight:700;color:#222;margin-bottom:10px}
+    .attention-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .attention-card{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:#fff;border:1px solid #dce3ee;border-radius:10px;color:inherit;text-decoration:none;transition:border-color .15s,box-shadow .15s,transform .15s}
+    .attention-card:hover{border-color:#9db7e8;box-shadow:0 4px 14px rgba(30,73,140,.09);transform:translateY(-1px)}
+    .attention-card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .attention-card--criteria .attention-card-icon{background:#fff3e0;color:#e65100}
+    .attention-card--rule .attention-card-icon{background:#e8f0fe;color:#1a73e8}
+    .attention-card-body{flex:1;min-width:0}
+    .attention-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+    .attention-card-name{font-size:13.5px;font-weight:700;color:#222}
+    .attention-card-count{min-width:25px;height:22px;padding:0 7px;border-radius:11px;background:#eef2f7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#40506a}
+    .attention-card-desc{font-size:12.5px;color:#666;line-height:1.45}
+    @media(max-width:780px){.attention-summary-grid{grid-template-columns:1fr}}
+
     /* === APPROVAL SECTION CARD === */
     .approval-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;margin:20px 28px;overflow:hidden}
     .early-access-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#fff3e0;color:#e65100;border:1px solid #ffcc80}
@@ -312,6 +328,7 @@
         <ul class="tsb-items hidden" id="attnItems">
           <li><a href="#">Upload Pending<span class="nav-badge" style="background:#e53935;margin-left:auto">1</span></a></li>
           <li><a href="reliability-alerts.html">Reliability Alerts<span class="nav-badge" style="background:#e53935;margin-left:auto">3</span></a></li>
+          <li><a href="unapproved-by-automation.html">Unapproved by Automation<span class="nav-badge" style="background:#e53935;margin-left:auto">10</span></a></li>
         </ul>
 
         <!-- Tools group -->
@@ -344,6 +361,26 @@
         </div>
         <div class="page-subtitle">Select and configure how patches should be approved</div>
       </div>
+
+      <section class="attention-summary" aria-labelledby="approvalAttentionTitle">
+        <div class="attention-summary-title" id="approvalAttentionTitle">Approval attention</div>
+        <div class="attention-summary-grid">
+          <a class="attention-card attention-card--criteria" href="unapproved-by-automation.html?view=criteria">
+            <span class="attention-card-icon"><i class="fa fa-list-check"></i></span>
+            <span class="attention-card-body">
+              <span class="attention-card-head"><span class="attention-card-name">Approval Criteria Not Met</span><span class="attention-card-count">6</span></span>
+              <span class="attention-card-desc">Validated patches that did not satisfy all criteria in their matching approval rule.</span>
+            </span>
+          </a>
+          <a class="attention-card attention-card--rule" href="unapproved-by-automation.html?view=no-rule">
+            <span class="attention-card-icon"><i class="fa fa-diagram-project"></i></span>
+            <span class="attention-card-body">
+              <span class="attention-card-head"><span class="attention-card-name">No Matching Approval Rule</span><span class="attention-card-count">4</span></span>
+              <span class="attention-card-desc">Patches that did not match an active approval rule and were not submitted for validation.</span>
+            </span>
+          </a>
+        </div>
+      </section>
 
       <!-- Approval options card -->
       <div class="approval-card">
